@@ -3,50 +3,77 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101b22">
-  <title>Training modules</title>
+  <meta name="theme-color" content="#f4f6ff">
+  <title>Weekly training</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <main class="shell">
-    <header class="topbar">
-      <a class="brand" href="#" aria-label="Training modules home"><span class="brand-mark">T</span><span>FIELDNOTES <small>TRAINING</small></span></a>
-      <div class="session-status"><span class="live-dot"></span><span id="statusText">Ready when you are</span></div>
-      <button class="text-button" id="logToggle" type="button">Session log <span id="logCount">0</span></button>
+<body class="weekly-app">
+  <main class="weekly-shell">
+    <header class="week-header" id="weekHeader">
+      <button class="day-arrow" id="previousDay" type="button" aria-label="Previous day">‹</button>
+      <div class="day-heading" aria-live="polite">
+        <span class="day-name" id="dayName">Loading</span>
+        <span class="day-separator">·</span>
+        <h1 id="setName">Training plan</h1>
+      </div>
+      <button class="today-button" id="todayButton" type="button">Today</button>
+      <button class="day-arrow" id="nextDay" type="button" aria-label="Next day">›</button>
+      <button class="icon-button" id="fullscreenButton" type="button" aria-label="Enter full screen" title="Enter full screen" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path id="fullscreenGlyph" d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3"/></svg>
+      </button>
     </header>
 
-    <section class="stage" aria-live="polite">
-      <aside class="rail">
-        <div class="rail-label">YOUR SESSION</div>
-        <div class="progress-track"><div id="progressFill"></div></div>
-        <div class="module-count"><strong id="moduleNumber">01</strong><span> / <span id="moduleTotal">00</span></span></div>
-        <div class="rail-caption">MODULE</div>
-        <div class="module-dots" id="moduleDots" aria-label="Module progress"></div>
+    <section class="workspace" aria-live="polite">
+      <aside class="session-rail">
+        <div class="rail-topline"><span class="rail-label">SELECTED TRAINING SET</span><span class="session-status"><i class="live-dot"></i><span id="statusText">Ready</span></span></div>
+        <div class="set-summary"><span id="railDay">MONDAY</span><strong id="railSet">Relaxing</strong></div>
+        <div class="session-controls">
+          <button class="button button-start" id="startButton" type="button"><span aria-hidden="true">▶</span> Start module</button>
+          <button class="button button-done" id="doneButton" type="button" hidden>Done <span aria-hidden="true">✓</span></button>
+          <div class="timer-panel" id="timerPanel" hidden>
+            <span class="timer-label">SESSION TIMER</span>
+            <strong id="timerDisplay">00:00</strong>
+            <span class="timer-started" id="timerStarted"></span>
+          </div>
+        </div>
+        <div class="rail-divider"></div>
+        <div class="module-list-head"><span class="rail-label">IN THIS SET</span><span class="module-count"><strong id="moduleNumber">01</strong> / <span id="moduleTotal">03</span></span></div>
+        <nav class="module-list" id="moduleList" aria-label="Modules in this training set"></nav>
+        <div class="rail-bottom">
+          <div class="set-progress"><span id="progressFill"></span></div>
+          <div class="rail-actions">
+            <button class="rail-nav" id="backButton" type="button" aria-label="Previous module">← Back</button>
+            <button class="rail-nav" id="nextButton" type="button" aria-label="Next module">Next →</button>
+          </div>
+          <button class="log-button" id="logToggle" type="button"><span>Session log</span><span class="log-count" id="logCount">0</span></button>
+        </div>
       </aside>
 
-      <article class="module-card" id="moduleCard">
-        <div class="card-topline"><span class="eyebrow" id="moduleCategory">LOADING MODULES</span><span class="duration-tag" id="moduleDuration"></span></div>
-        <div class="card-content">
-          <div class="copy-column">
-            <h1 id="moduleTitle">Loading your training…</h1>
-            <p class="intro" id="moduleDescription"></p>
-            <div class="focus-box" id="focusBox"><span class="focus-icon">✳</span><div><span class="focus-label">YOUR FOCUS</span><p id="moduleFocus"></p></div></div>
-            <div class="timer-panel" id="timerPanel" hidden>
-              <span class="timer-label"><span class="live-dot"></span> SESSION TIMER</span>
-              <strong id="timerDisplay">00:00</strong>
-              <span class="timer-started" id="timerStarted"></span>
-            </div>
-          </div>
-          <div class="visual-column" id="visualColumn" aria-hidden="true"><div class="orb orb-one"></div><div class="orb orb-two"></div><div class="visual-lines"></div><div class="visual-index" id="visualIndex">01</div><div class="visual-caption">SHOW UP<br>WITH INTENTION</div></div>
+      <article class="module-view" id="moduleView">
+        <div class="module-heading">
+          <span class="module-category"><span id="moduleCategory">LOADING</span><span class="module-id" id="moduleId">01-warmup</span></span>
+          <span class="duration-tag" id="moduleDuration"></span>
         </div>
-        <div class="card-bottom"><div class="controls-left"><button class="nav-button" id="backButton" type="button" aria-label="Previous module">← <span>Back</span></button><span class="key-hint">← / → to navigate</span></div><div class="controls-right"><button class="button button-quiet" id="startButton" type="button"><span class="play-icon">▶</span> Start</button><button class="button button-primary" id="doneButton" type="button" hidden>Done <span>✓</span></button><button class="nav-button next-button" id="nextButton" type="button" aria-label="Next module"><span>Next</span> →</button></div></div>
+        <div class="module-content" id="moduleContent">
+          <div class="module-copy">
+            <h2 id="moduleTitle">Loading your training…</h2>
+            <section class="instructions-pane" aria-label="Module instructions">
+              <div class="instructions-label">INSTRUCTIONS</div>
+              <div class="markdown-content" id="moduleInstructions"></div>
+            </section>
+          </div>
+          <div class="module-visual" id="visualColumn">
+            <img class="module-image" id="moduleImage" alt="" hidden>
+            <div class="visual-placeholder" id="visualPlaceholder" aria-hidden="true"><span id="visualIndex">01</span><i></i></div>
+            <span class="visual-caption" id="visualCaption">ONE MODULE AT A TIME</span>
+          </div>
+        </div>
       </article>
     </section>
-    <footer><span>TAKE IT ONE MODULE AT A TIME.</span><span id="footerDate"></span></footer>
   </main>
 
   <dialog id="logDialog" class="log-dialog">
-    <div class="dialog-head"><div><span class="eyebrow">YOUR PRACTICE</span><h2>Session log</h2></div><button class="close-button" id="closeLog" aria-label="Close log">×</button></div>
+    <div class="dialog-head"><div><span class="module-category">YOUR PRACTICE</span><h2>Session log</h2></div><button class="close-button" id="closeLog" type="button" aria-label="Close log">×</button></div>
     <div id="logEntries" class="log-entries"></div>
     <div class="dialog-foot"><span>Saved on this device</span><button id="clearLog" class="text-button" type="button">Clear log</button></div>
   </dialog>
