@@ -218,3 +218,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local session history may contain personal information
+session-log.json
+
+# Local credentials
+.env
