@@ -1,0 +1,26 @@
+{
+  "title": "Training modules",
+  "modules": [
+    {
+      "category": "FOUNDATION · 01",
+      "title": "Arrive in the moment.",
+      "description": "Before you begin, give yourself a moment to settle. Let the noise of the day fall away and bring your attention to what you’re here to practice.",
+      "focus": "Take three slow breaths. Notice how you feel, without needing to change it.",
+      "duration": "2 MIN"
+    },
+    {
+      "category": "MOVEMENT · 02",
+      "title": "Build a steady rhythm.",
+      "description": "Choose a pace you can sustain. The goal is to stay engaged and present, building consistency one deliberate movement at a time.",
+      "focus": "Keep your effort comfortable. Check in with your posture and breathing as you go.",
+      "duration": "5 MIN"
+    },
+    {
+      "category": "REFLECTION · 03",
+      "title": "Notice what changed.",
+      "description": "Take a few minutes to reflect on the practice. Small observations help turn an ordinary session into something you can learn from.",
+      "focus": "Name one thing that felt easier, and one thing you want to return to next time.",
+      "duration": "3 MIN"
+    }
+  ]
+}

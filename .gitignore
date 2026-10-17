@@ -1,0 +1,9 @@
+# Local session history can contain personal information
+session-log.json
+
+# Python runtime artifacts
+__pycache__/
+*.py[cod]
+
+# Local credentials
+.env
