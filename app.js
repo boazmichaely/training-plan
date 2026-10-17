@@ -1,6 +1,6 @@
 const $ = (id) => document.getElementById(id);
 const state = {
-  days: [], setsById: new Map(), modulesById: new Map(), logs: [],
+  days: [], workoutsById: new Map(), modulesById: new Map(), logs: [],
   dayIndex: 0, moduleIndex: 0, startedAt: null, timerId: null,
 };
 
@@ -11,10 +11,23 @@ function todayIndex() {
   return weekday === 0 ? 6 : weekday - 1;
 }
 function currentDay() { return state.days[state.dayIndex]; }
-function currentSet() { return state.setsById.get(currentDay().setId); }
-function currentModules() { return currentSet().moduleIds.map((id) => state.modulesById.get(id)); }
+function currentWorkout() { return state.workoutsById.get(currentDay().workoutId); }
+function currentModules() { return currentWorkout().moduleIds.map((id) => state.modulesById.get(id)); }
 function currentModule() { return currentModules()[state.moduleIndex]; }
 
+function parseInstructionSections(markdown) {
+  const sections = new Map();
+  let currentId = null;
+  let lines = [];
+  const save = () => { if (currentId) sections.set(currentId, lines.join('\n').trim()); };
+  for (const line of String(markdown || '').split(/\r?\n/)) {
+    const match = line.match(/^##\s+(\d{2}-[a-z0-9-]+)\s*$/i);
+    if (match) { save(); currentId = match[1]; lines = []; }
+    else if (currentId) lines.push(line);
+  }
+  save();
+  return sections;
+}
 function appendInlineMarkdown(parent, text) {
   const syntax = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
   let offset = 0;
@@ -53,14 +66,17 @@ function renderInstructions(markdown) {
       while (index < lines.length) {
         const itemMatch = lines[index].match(listPattern);
         if (!itemMatch || /^\s*\d+\. /.test(lines[index]) !== ordered) break;
-        let itemText = itemMatch[2];
+        const itemLines = [itemMatch[2].trimEnd()];
         index += 1;
         while (index < lines.length && /^\s+\S/.test(lines[index]) && !lines[index].match(listPattern)) {
-          itemText += ` ${lines[index].trim()}`;
+          itemLines.push(lines[index].trim());
           index += 1;
         }
         const item = document.createElement('li');
-        appendInlineMarkdown(item, itemText);
+        itemLines.forEach((line, lineIndex) => {
+          if (lineIndex) item.append(document.createElement('br'));
+          appendInlineMarkdown(item, line);
+        });
         list.append(item);
       }
       container.append(list);
@@ -81,18 +97,20 @@ function renderInstructions(markdown) {
 
 function render() {
   const day = currentDay();
-  const set = currentSet();
+  const workout = currentWorkout();
   const modules = currentModules();
   const isToday = state.dayIndex === todayIndex();
   const module = modules[state.moduleIndex];
   $('weekHeader').classList.toggle('is-today', isToday);
   $('dayName').textContent = day.label;
-  $('setName').textContent = set.name;
+  $('workoutName').textContent = workout.name;
   $('todayButton').disabled = isToday || Boolean(state.startedAt);
   $('previousDay').disabled = Boolean(state.startedAt);
   $('nextDay').disabled = Boolean(state.startedAt);
   $('railDay').textContent = day.label.toUpperCase();
-  $('railSet').textContent = set.name;
+  $('workoutNameRail').textContent = workout.name;
+  $('workoutSummary').textContent = workout.summary || '';
+  $('workoutDescription').textContent = workout.description || '';
 
   $('moduleCategory').textContent = module.category || 'TRAINING';
   $('moduleId').textContent = module.id;
@@ -130,11 +148,11 @@ function render() {
   $('visualColumn').hidden = !hasImage;
   $('moduleContent').classList.toggle('with-image', hasImage);
   $('visualPlaceholder').hidden = true;
-  $('visualCaption').hidden = !hasImage;
   $('visualColumn').classList.toggle('has-image', hasImage);
   if (hasImage) {
     image.src = module.image;
     image.alt = module.imageAlt || '';
+    image.removeAttribute('style');
   } else {
     image.removeAttribute('src');
     image.alt = '';
@@ -160,13 +178,13 @@ function start() {
   if (state.startedAt) return;
   const now = new Date();
   const day = currentDay();
-  const set = currentSet();
+  const workout = currentWorkout();
   const module = currentModule();
   state.startedAt = {
     timestamp: now.getTime(), date: localDate(now),
     time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
     moduleId: module.id, module: module.title,
-    setId: set.id, setName: set.name, setDay: day.label,
+    workoutId: workout.id, workoutName: workout.name, workoutDay: day.label,
   };
   $('statusText').textContent = 'In progress';
   $('timerStarted').textContent = `Started ${state.startedAt.time}`;
@@ -178,7 +196,7 @@ async function done() {
   if (!state.startedAt) return;
   const elapsed = Math.max(0, Math.floor((Date.now() - state.startedAt.timestamp) / 1000));
   const entry = {
-    setId: state.startedAt.setId, setName: state.startedAt.setName, setDay: state.startedAt.setDay,
+    workoutId: state.startedAt.workoutId, workoutName: state.startedAt.workoutName, workoutDay: state.startedAt.workoutDay,
     moduleId: state.startedAt.moduleId, module: state.startedAt.module,
     date: state.startedAt.date, startTime: state.startedAt.time,
     duration: mmss(elapsed), seconds: elapsed,
@@ -233,7 +251,9 @@ function renderLog() {
     const row = document.createElement('div');
     row.className = 'log-entry';
     const set = document.createElement('strong');
-    set.textContent = entry.setName ? `${entry.setDay || ''} · ${entry.setName}` : 'Training session';
+    const workoutName = entry.workoutName || entry.setName;
+    const workoutDay = entry.workoutDay || entry.setDay;
+    set.textContent = workoutName ? `${workoutDay || ''} · ${workoutName}` : 'Training session';
     const module = document.createElement('span');
     module.className = 'log-module';
     module.textContent = entry.module || '';
@@ -254,19 +274,26 @@ async function init() {
     if (!logsResponse.ok) throw new Error('Could not load session-log.json');
     const data = await planResponse.json();
     if (!Array.isArray(data.days) || data.days.length !== 7) throw new Error('modules.json must define all seven weekdays.');
-    if (!Array.isArray(data.sets) || !Array.isArray(data.modules)) throw new Error('modules.json must define sets and modules.');
+    if (!Array.isArray(data.workouts) || !Array.isArray(data.modules)) throw new Error('modules.json must define workouts and modules.');
+    let instructionSections = new Map();
+    if (data.instructionsFile) {
+      const instructionsResponse = await fetch(data.instructionsFile, { cache: 'no-store' });
+      if (!instructionsResponse.ok) throw new Error(`Could not load ${data.instructionsFile}.`);
+      instructionSections = parseInstructionSections(await instructionsResponse.text());
+    }
     data.modules.forEach((module, index) => {
       const expectedId = String(index + 1).padStart(2, '0');
       if (!module.id?.startsWith(`${expectedId}-`)) throw new Error(`Module ${index + 1} must use the ID prefix ${expectedId} and modules must stay in number order.`);
-      if (typeof module.instructions !== 'string') throw new Error(`Module ${module.id} needs an instructions field.`);
+      if (instructionSections.has(module.id)) module.instructions = instructionSections.get(module.id);
+      if (typeof module.instructions !== 'string') throw new Error(`No Markdown instructions were found for module ${module.id}. Add a section headed ## ${module.id} in ${data.instructionsFile || 'modules.json'}.`);
     });
-    state.setsById = new Map(data.sets.map((set) => [set.id, set]));
+    state.workoutsById = new Map(data.workouts.map((workout) => [workout.id, workout]));
     state.modulesById = new Map(data.modules.map((module) => [module.id, module]));
     state.days = data.days;
     for (const day of state.days) {
-      const set = state.setsById.get(day.setId);
-      if (!set || !Array.isArray(set.moduleIds) || !set.moduleIds.length || set.moduleIds.length > 5) throw new Error(`The ${day.label} set must contain between one and five modules.`);
-      if (set.moduleIds.some((id) => !state.modulesById.has(id))) throw new Error(`The ${day.label} set references a missing module.`);
+      const workout = state.workoutsById.get(day.workoutId);
+      if (!workout || !Array.isArray(workout.moduleIds) || !workout.moduleIds.length || workout.moduleIds.length > 8) throw new Error(`The ${day.label} workout must contain between one and eight modules.`);
+      if (workout.moduleIds.some((id) => !state.modulesById.has(id))) throw new Error(`The ${day.label} workout references a missing module.`);
     }
     state.logs = await logsResponse.json();
     // Import any sessions saved by the earlier browser-only version if the local file is empty.
@@ -288,13 +315,24 @@ async function init() {
     render();
   } catch (error) {
     $('moduleTitle').textContent = 'Could not load the weekly plan.';
-    $('moduleDescription').textContent = 'Start the local server with python server.py, then check modules.json.';
+    $('workoutDescription').textContent = 'Start the local server with python server.py, then check modules.json.';
     $('statusText').textContent = 'Plan unavailable';
     console.error(error);
   }
 }
 
 $('startButton').addEventListener('click', start);
+$('railToggle').addEventListener('click', () => {
+  const collapsed = !$('workspace').classList.contains('rail-collapsed');
+  $('workspace').classList.toggle('rail-collapsed', collapsed);
+  $('railToggle').setAttribute('aria-expanded', String(!collapsed));
+  $('railToggle').setAttribute('aria-label', collapsed ? 'Expand side panel' : 'Collapse side panel');
+  $('railToggle').title = collapsed ? 'Expand side panel' : 'Collapse side panel';
+  $('railToggle').querySelector('path').setAttribute('d', collapsed
+    ? 'm10 6 6 6-6 6M4 6l6 6-6 6'
+    : 'm14 6-6 6 6 6M20 6l-6 6 6 6');
+  try { localStorage.setItem('training-side-panel-collapsed', String(collapsed)); } catch (error) { /* The control still works for this page view. */ }
+});
 $('doneButton').addEventListener('click', done);
 $('previousDay').addEventListener('click', () => navigateDay(-1));
 $('nextDay').addEventListener('click', () => navigateDay(1));
@@ -340,4 +378,12 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowLeft') navigateModule(-1);
   if (event.key === 'ArrowRight') navigateModule(1);
 });
+try {
+  $('workspace').classList.toggle('rail-collapsed', localStorage.getItem('training-side-panel-collapsed') === 'true');
+  const collapsed = $('workspace').classList.contains('rail-collapsed');
+  $('railToggle').setAttribute('aria-expanded', String(!collapsed));
+  $('railToggle').setAttribute('aria-label', collapsed ? 'Expand side panel' : 'Collapse side panel');
+  $('railToggle').title = collapsed ? 'Expand side panel' : 'Collapse side panel';
+  if (collapsed) $('railToggle').querySelector('path').setAttribute('d', 'm10 6 6 6-6 6M4 6l6 6-6 6');
+} catch (error) { /* Ignore unavailable local storage. */ }
 init();

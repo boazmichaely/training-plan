@@ -167,8 +167,6 @@ body.weekly-app{height:100dvh;min-height:620px;overflow:hidden;background:#f4f6f
 .module-image{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#e8ddc9}
 .visual-placeholder{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden;color:#e0ff78;font:300 clamp(80px,14vw,220px) 'DM Mono',monospace}
 .visual-placeholder i{position:absolute;width:58%;aspect-ratio:1;border:1px solid #e4ecff45;border-radius:50%;box-shadow:0 0 0 35px #d7ff4f08,0 0 0 75px #d7ff4f06}
-.visual-caption{position:absolute;right:18px;bottom:16px;z-index:2;color:#fff;font:600 8px 'DM Mono',monospace;letter-spacing:.14em;text-shadow:0 1px 8px #101a3890}
-.module-visual.has-image::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 70%,#101a3850)}
 .log-dialog{width:min(620px,calc(100vw - 28px));max-height:82vh;border:0;border-radius:12px;padding:0;overflow:hidden;box-shadow:0 22px 90px #17204c44;color:#151b3d}
 .log-dialog::backdrop{background:#17204c99;backdrop-filter:blur(4px)}
 .dialog-head{padding:22px 26px 16px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #e2e6fb}
@@ -273,3 +271,65 @@ body.weekly-app{height:100dvh;min-height:620px;overflow:hidden;background:#f4f6f
 }
 @media(max-width:780px){.module-copy h2{font-size:clamp(25px,6vw,40px);line-height:1.08;margin-bottom:10px}}
 @media(max-width:420px){.module-copy h2{font-size:clamp(24px,7vw,31px)}}
+
+/* Keep a small, reachable handle when the session panel is collapsed. */
+.rail-topline{position:relative;min-height:24px;padding-right:34px}
+@media(max-width:780px){.session-rail .rail-topline{display:flex;align-items:center}}
+.rail-toggle{position:absolute;right:0;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:30px;height:30px;border:1px solid #dfe5fb;border-radius:7px;background:#fff;color:#4659cf;cursor:pointer}
+.rail-toggle:hover{background:#eef1ff}
+.rail-toggle:focus-visible{outline:2px solid #495ee7;outline-offset:2px}
+.rail-toggle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.workspace.rail-collapsed{grid-template-columns:52px minmax(0,1fr)}
+.workspace.rail-collapsed .session-rail{padding:12px 8px;overflow:hidden}
+.workspace.rail-collapsed .session-rail>*:not(.rail-topline){display:none}
+.workspace.rail-collapsed .rail-topline{display:block;min-height:30px;padding:0}
+.workspace.rail-collapsed .rail-topline>*:not(.rail-toggle){display:none}
+.workspace.rail-collapsed .rail-toggle{left:50%;right:auto;transform:translate(-50%,-50%)}
+@media(max-width:780px){
+  .workspace.rail-collapsed{display:flex;flex-direction:column;gap:10px}
+  .workspace.rail-collapsed .session-rail{flex:none;min-height:52px;height:52px;padding:10px}
+  .workspace.rail-collapsed .rail-topline{display:block;min-height:30px}
+}
+.set-summary .workout-summary{font:600 9px 'DM Mono',monospace;letter-spacing:.04em;color:#7d86aa}
+.workout-description{margin:-5px 0 14px;color:#667092;font-size:11px;line-height:1.5}
+.module-visual.has-image{width:min(100%,70vh);aspect-ratio:1/1;height:auto;align-self:center;justify-self:center;min-height:0;}
+.module-visual.has-image .module-image{object-fit:contain;background:#fff}
+.module-visual.has-image::after{content:none}
+:fullscreen .weekly-shell{height:100dvh;min-height:0;padding-bottom:10px}
+:fullscreen .week-header{height:56px;flex-basis:56px}
+:fullscreen .workspace{min-height:0;padding-top:8px}
+:fullscreen .module-view{min-height:0;overflow:hidden}
+:fullscreen .module-content.with-image{min-height:0;grid-template-columns:minmax(0,1fr) minmax(280px,40%)}
+:fullscreen .module-copy{min-height:0;overflow:auto}
+:fullscreen .instructions-pane{min-height:0;overflow:auto}
+:fullscreen .module-visual.has-image{width:min(100%,calc(100dvh - 150px));height:auto;max-height:calc(100dvh - 150px);aspect-ratio:1/1}
+:fullscreen .module-visual.has-image .module-image{max-width:100%;max-height:100%;object-fit:contain}
+@media(max-width:780px){
+  .set-summary .workout-summary{font-size:8px}
+  .workout-description{margin:-4px 0 10px;font-size:10px}
+  .module-visual.has-image{width:min(100%,70vw);height:auto;min-height:0;aspect-ratio:1/1}
+}
+@media(max-width:780px){
+  :fullscreen .module-view{height:auto;min-height:0;overflow:visible}
+  :fullscreen .module-content.with-image{grid-template-columns:1fr}
+  :fullscreen .module-copy{height:auto;overflow:visible}
+  :fullscreen .instructions-pane{max-height:none;overflow:visible}
+  :fullscreen .module-visual.has-image{width:min(100%,70vw);height:auto;max-height:none;justify-self:center}
+}
+
+/* Give the module title the full content width and start its image beside the instructions. */
+.module-title{flex:none;width:100%;max-width:none;margin:clamp(16px,2.4vh,28px) 0 0;font:500 clamp(42px,4vw,78px)/1.02 'Playfair Display',serif;letter-spacing:-.04em;color:#151b3d}
+.module-content{padding-top:clamp(12px,1.8vh,20px)}
+.module-content.with-image{grid-template-columns:minmax(0,1.08fr) minmax(360px,.92fr)}
+.module-visual.has-image{align-self:start;margin-top:0}
+:fullscreen .module-content.with-image{grid-template-columns:minmax(0,1.08fr) minmax(360px,.92fr)}
+:fullscreen .module-visual.has-image{align-self:start}
+@media(max-width:780px){
+  .module-title{font-size:clamp(32px,7vw,48px);line-height:1.06;margin-top:16px}
+  .module-content{padding-top:12px}
+  .module-content.with-image{grid-template-columns:1fr}
+  .module-visual.has-image{align-self:center}
+}
+/* Make the prescribed work amount easy to read at a glance. */
+.duration-tag{font-size:clamp(18px,1.6vw,30px);font-weight:600;line-height:1.1;padding:10px 16px}
+@media(max-width:780px){.duration-tag{font-size:clamp(15px,2.8vw,20px);padding:7px 10px}}

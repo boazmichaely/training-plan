@@ -4,115 +4,87 @@
     {
       "id": "monday",
       "label": "Monday",
-      "setId": "monday-relaxing"
+      "workoutId": "weekday-easy"
     },
     {
       "id": "tuesday",
       "label": "Tuesday",
-      "setId": "tuesday-light-movement"
+      "workoutId": "weekday-easy"
     },
     {
       "id": "wednesday",
       "label": "Wednesday",
-      "setId": "wednesday-strength-basics"
+      "workoutId": "weekday-easy"
     },
     {
       "id": "thursday",
       "label": "Thursday",
-      "setId": "thursday-mobility"
+      "workoutId": "weekday-easy"
     },
     {
       "id": "friday",
       "label": "Friday",
-      "setId": "friday-conditioning"
+      "workoutId": "strength-a"
     },
     {
       "id": "saturday",
       "label": "Saturday",
-      "setId": "saturday-muscle-up"
+      "workoutId": "walk-balance"
     },
     {
       "id": "sunday",
       "label": "Sunday",
-      "setId": "sunday-recovery"
+      "workoutId": "strength-b"
     }
   ],
-  "sets": [
+  "workouts": [
     {
-      "id": "monday-relaxing",
-      "name": "Relaxing",
+      "id": "weekday-easy",
+      "name": "Everyday activity",
+      "summary": "Optional easy movement · 10–20 min",
+      "description": "Keep up ordinary activity and take a comfortable walk.",
       "moduleIds": [
-        "01-warmup",
-        "02-breathing-reset",
-        "03-gentle-mobility",
-        "04-easy-walk",
-        "05-close"
+        "15-easy-walk"
       ]
     },
     {
-      "id": "tuesday-light-movement",
-      "name": "Light Movement",
+      "id": "strength-a",
+      "name": "Strength A",
+      "summary": "Home strength · about 30 min",
+      "description": "Use a firm chair, light band, and counter. Rest 60–90 seconds between sets.",
       "moduleIds": [
         "01-warmup",
-        "06-marching",
-        "07-chair-squats",
-        "08-wall-push-ups",
-        "09-cooldown-walk"
+        "02-chair-sit-to-stand",
+        "03-wall-push-ups",
+        "04-seated-band-row",
+        "05-hip-abduction",
+        "06-calf-raises"
       ]
     },
     {
-      "id": "wednesday-strength-basics",
-      "name": "Strength Basics",
+      "id": "walk-balance",
+      "name": "Walking and balance",
+      "summary": "Easy conditioning · 20–30 min",
+      "description": "Walk then practice balance beside a sturdy counter.",
       "moduleIds": [
-        "01-warmup",
-        "10-squats",
-        "11-incline-push-ups",
-        "12-hip-hinges",
-        "13-calf-raises"
+        "15-easy-walk",
+        "11-tandem-balance",
+        "12-supported-weight-shifts",
+        "14-cool-down-walk"
       ]
     },
     {
-      "id": "thursday-mobility",
-      "name": "Mobility",
+      "id": "strength-b",
+      "name": "Strength B",
+      "summary": "Home strength · about 30 min",
+      "description": "Use a firm chair, light band, and counter. Rest 60–90 seconds between sets.",
       "moduleIds": [
         "01-warmup",
-        "14-shoulders",
-        "15-hips",
-        "16-ankles",
-        "17-reset"
-      ]
-    },
-    {
-      "id": "friday-conditioning",
-      "name": "Conditioning",
-      "moduleIds": [
-        "01-warmup",
-        "18-brisk-intervals",
-        "19-step-touches",
-        "20-steady-walk",
-        "21-cooldown"
-      ]
-    },
-    {
-      "id": "saturday-muscle-up",
-      "name": "Muscle Up",
-      "moduleIds": [
-        "01-warmup",
-        "22-chair-squats",
-        "23-wall-push-ups",
-        "24-glute-bridges",
-        "25-bird-dogs"
-      ]
-    },
-    {
-      "id": "sunday-recovery",
-      "name": "Recovery",
-      "moduleIds": [
-        "01-warmup",
-        "26-breathing",
-        "27-joint-mobility",
-        "28-easy-walk",
-        "29-reflection"
+        "02-chair-sit-to-stand",
+        "07-standing-band-chest-press",
+        "08-supported-dumbbell-row",
+        "09-standing-hamstring-curl",
+        "10-supported-march"
       ]
     }
   ],
@@ -120,207 +92,123 @@
     {
       "id": "01-warmup",
       "category": "WARMUP",
-      "title": "Warm up and get moving.",
-      "duration": "5 MIN",
-      "image": "images/warmup.png",
-      "imageAlt": "Person doing a gentle standing side stretch",
-      "instructions": "- Walk around or march gently in place for 2 minutes.\n- Roll your shoulders forward and back, then make comfortable arm circles.\n- Add easy side-to-side turns and a few gentle moving stretches for the areas you plan to use.\n- Keep the movements smooth and within a comfortable range. Do not force or bounce into a stretch."
-    },
-    {
-      "id": "02-breathing-reset",
-      "category": "RESET",
-      "title": "Monday 02-breathing-reset",
-      "duration": "2 MIN",
-      "instructions": "- Sit or stand in a relaxed position. Let your shoulders soften.\n- Breathe in gently through your nose, then let the breath out slowly.\n- Continue at an easy pace for about 2 minutes. There is no need to hold your breath.\n- If you feel light-headed, return to normal breathing."
-    },
-    {
-      "id": "03-gentle-mobility",
-      "category": "MOBILITY",
-      "title": "Monday 03-gentle-mobility",
+      "title": "Warm up gently",
       "duration": "4 MIN",
-      "instructions": "- Stand with a comfortable stance and keep your knees soft.\n- Slowly reach one arm overhead, then lower it; repeat on the other side.\n- Make a few small shoulder rolls and gentle side-to-side turns.\n- Use an easy range of motion and pause if anything feels uncomfortable."
+      "image": "images/exercises/01-warmup.png",
+      "imageAlt": "Older adult gently marching in place beside a sturdy chair"
     },
     {
-      "id": "04-easy-walk",
-      "category": "EASY MOVEMENT",
-      "title": "Monday 04-easy-walk",
-      "duration": "8 MIN",
-      "instructions": "- Walk indoors or outside at a pace that feels easy to sustain.\n- Let your arms swing naturally and keep your steps comfortable.\n- You should be able to speak in full sentences while walking.\n- Slow down or stop if you feel pain, dizziness, or unusual shortness of breath."
-    },
-    {
-      "id": "05-close",
-      "category": "CLOSE",
-      "title": "Monday 05-close",
-      "duration": "2 MIN",
-      "instructions": "- Stand or sit quietly for a moment and let your breathing settle.\n- Notice one thing that felt pleasant or comfortable today.\n- Have a drink of water if you are thirsty."
-    },
-    {
-      "id": "06-marching",
-      "category": "LIGHT MOVEMENT",
-      "title": "Tuesday 06-marching",
-      "duration": "3 MIN",
-      "instructions": "- March gently in place, lifting each foot only as high as feels comfortable.\n- Let your arms swing naturally or hold a chair for balance.\n- Keep an easy, even rhythm and breathe normally."
-    },
-    {
-      "id": "07-chair-squats",
-      "category": "LOWER BODY",
-      "title": "Tuesday 07-chair-squats",
-      "duration": "2 SETS · 8 REPS",
-      "instructions": "- Stand in front of a sturdy chair with feet about hip-width apart.\n- Send your hips back and bend your knees to lower toward the seat.\n- Tap the chair lightly, then stand by pressing through your feet.\n- Use the chair or reduce the depth as needed. Rest between sets."
-    },
-    {
-      "id": "08-wall-push-ups",
-      "category": "UPPER BODY",
-      "title": "Tuesday 08-wall-push-ups",
-      "duration": "2 SETS · 8 REPS",
-      "instructions": "- Stand an arm’s length from a clear, stable wall. Place your palms on it at chest height.\n- Keep your body in a comfortable straight line and bend your elbows to bring your chest toward the wall.\n- Press gently back to the start. Step closer to make it easier.\n- Stop if you feel pain in your wrists or shoulders."
-    },
-    {
-      "id": "09-cooldown-walk",
-      "category": "COOLDOWN",
-      "title": "Tuesday 09-cooldown-walk",
-      "duration": "4 MIN",
-      "instructions": "- Walk slowly around the room or along a clear path.\n- Gradually let your pace become easier.\n- Finish when your breathing feels settled and comfortable."
-    },
-    {
-      "id": "10-squats",
+      "id": "02-chair-sit-to-stand",
       "category": "STRENGTH · LEGS",
-      "title": "Wednesday 10-squats",
-      "duration": "2 SETS · 8 REPS",
-      "instructions": "- Stand with feet about hip-width apart; keep a chair nearby for support.\n- Bend your knees and hips to a comfortable depth, keeping your heels on the floor.\n- Stand smoothly without locking your knees.\n- Rest until your breathing is easy before the next set."
+      "title": "High-chair sit-to-stand",
+      "duration": "2 SETS · 6–10 REPS",
+      "image": "images/exercises/02-chair-sit-to-stand.png",
+      "imageAlt": "Older adult practicing a controlled sit-to-stand from a firm chair"
     },
     {
-      "id": "11-incline-push-ups",
+      "id": "03-wall-push-ups",
       "category": "STRENGTH · PUSH",
-      "title": "Wednesday 11-incline-push-ups",
-      "duration": "2 SETS · 8 REPS",
-      "instructions": "- Use a sturdy counter or wall that cannot slide. Place hands slightly wider than shoulder-width.\n- Step back and keep your body comfortably aligned.\n- Bend your elbows to bring your chest toward the surface, then press away.\n- Choose a higher surface or fewer repetitions if needed."
+      "title": "Wall push-ups",
+      "duration": "2 SETS · 8–12 REPS",
+      "image": "images/exercises/03-wall-push-ups.png",
+      "imageAlt": "Older adult doing a wall push-up with hands at chest height"
     },
     {
-      "id": "12-hip-hinges",
+      "id": "04-seated-band-row",
+      "category": "STRENGTH · BACK",
+      "title": "Seated resistance-band row",
+      "duration": "2 SETS · 8–12 REPS",
+      "image": "images/exercises/04-seated-band-row.png",
+      "imageAlt": "Older adult seated upright, pulling a resistance band toward the torso"
+    },
+    {
+      "id": "05-hip-abduction",
       "category": "STRENGTH · HIPS",
-      "title": "Wednesday 12-hip-hinges",
-      "duration": "2 SETS · 10 REPS",
-      "instructions": "- Stand with knees slightly bent and hands resting on your hips.\n- Push your hips backward while keeping your back comfortable and long.\n- Stop when you feel a gentle stretch at the backs of your thighs, then stand tall.\n- Move slowly; this is a practice of control, not depth."
+      "title": "Supported standing hip abduction",
+      "duration": "2 SETS · 8–12 EACH SIDE",
+      "image": "images/exercises/05-hip-abduction.png",
+      "imageAlt": "Older adult holding a counter and moving one leg gently out to the side"
     },
     {
-      "id": "13-calf-raises",
+      "id": "06-calf-raises",
       "category": "STRENGTH · CALVES",
-      "title": "Wednesday 13-calf-raises",
-      "duration": "2 SETS · 10 REPS",
-      "instructions": "- Stand behind a sturdy chair and hold it lightly for balance.\n- Rise onto the balls of both feet, then lower your heels slowly.\n- Keep the movement smooth and use a comfortable range.\n- Rest between sets."
+      "title": "Supported calf raises",
+      "duration": "2 SETS · 10–15 REPS",
+      "image": "images/exercises/06-calf-raises.png",
+      "imageAlt": "Older adult holding a counter while slowly rising onto the balls of both feet"
     },
     {
-      "id": "14-shoulders",
-      "category": "MOBILITY · SHOULDERS",
-      "title": "Thursday 14-shoulders",
-      "duration": "2 MIN",
-      "instructions": "- Let your arms rest by your sides and gently lift your shoulders toward your ears.\n- Roll them backward and down, then repeat forward.\n- Make slow, small arm circles, gradually increasing only if comfortable.\n- Keep your neck relaxed and avoid forcing the movement."
+      "id": "07-standing-band-chest-press",
+      "category": "STRENGTH · CHEST",
+      "title": "Standing band chest press",
+      "duration": "2 SETS · 8–12 REPS",
+      "image": "images/band-chest-press.png",
+      "imageAlt": "Older adult doing a standing chest press with a resistance band looped around the upper back"
     },
     {
-      "id": "15-hips",
-      "category": "MOBILITY · HIPS",
-      "title": "Thursday 15-hips",
-      "duration": "2 MIN",
-      "instructions": "- Stand near a wall or chair for balance.\n- Shift your weight gently from one foot to the other.\n- If steady, lift one knee a little, lower it, and switch sides.\n- Keep the movement small and comfortable; support yourself whenever needed."
+      "id": "08-supported-dumbbell-row",
+      "category": "STRENGTH · BACK",
+      "title": "Supported one-arm dumbbell row",
+      "duration": "2 SETS · 8–12 EACH SIDE",
+      "image": "images/exercises/08-supported-dumbbell-row.png",
+      "imageAlt": "Older adult using one hand on a sturdy counter for support while rowing a light dumbbell"
     },
     {
-      "id": "16-ankles",
-      "category": "MOBILITY · ANKLES",
-      "title": "Thursday 16-ankles",
-      "duration": "2 MIN",
-      "instructions": "- Sit or stand with support. Lift one foot slightly.\n- Slowly point and flex the ankle several times, then make a few small circles.\n- Switch feet and repeat.\n- Keep the movement gentle and stop if it causes discomfort."
-    },
-    {
-      "id": "17-reset",
-      "category": "RESET",
-      "title": "Thursday 17-reset",
-      "duration": "2 MIN",
-      "instructions": "- Stand tall or sit comfortably.\n- Take a few normal, unhurried breaths while relaxing your hands and shoulders.\n- Notice how your body feels after moving. No stretch needs to be held or pushed."
-    },
-    {
-      "id": "18-brisk-intervals",
-      "category": "CONDITIONING",
-      "title": "Friday 18-brisk-intervals",
-      "duration": "6 MIN",
-      "instructions": "- Walk at an easy pace for 1 minute.\n- Walk a little faster for 1 minute while staying in control and able to speak.\n- Alternate easy and brisk minutes three times.\n- Use a level, clear route and return to an easy pace whenever you need."
-    },
-    {
-      "id": "19-step-touches",
-      "category": "CONDITIONING",
-      "title": "Friday 19-step-touches",
-      "duration": "3 MIN",
-      "instructions": "- Stand with feet comfortably apart, near a wall or chair if you want support.\n- Step one foot out to the side, bring the other foot in, then change sides.\n- Let your arms move naturally and keep a steady, easy rhythm.\n- Make the steps smaller or pause whenever needed."
-    },
-    {
-      "id": "20-steady-walk",
-      "category": "STEADY PACE",
-      "title": "Friday 20-steady-walk",
-      "duration": "8 MIN",
-      "instructions": "- Walk at a steady pace that feels moderately comfortable.\n- Keep your shoulders relaxed and your steps natural.\n- You should still be able to speak in short sentences.\n- Slow down or stop if you feel unwell or develop pain."
-    },
-    {
-      "id": "21-cooldown",
-      "category": "COOLDOWN",
-      "title": "Friday 21-cooldown",
-      "duration": "3 MIN",
-      "instructions": "- Reduce your pace gradually and walk easily.\n- Let your arms relax and breathe normally.\n- Finish when you feel settled."
-    },
-    {
-      "id": "22-chair-squats",
+      "id": "09-standing-hamstring-curl",
       "category": "STRENGTH · LEGS",
-      "title": "Saturday 22-chair-squats",
-      "duration": "3 SETS · 8 REPS",
-      "instructions": "- Place a sturdy chair behind you and stand with feet about hip-width apart.\n- Sit your hips back until you lightly touch the chair, then stand smoothly.\n- Keep your knees tracking in the same direction as your toes.\n- Rest between sets; use your hands for support if you need it."
+      "title": "Standing hamstring curl",
+      "duration": "2 SETS · 8–12 EACH SIDE",
+      "image": "images/exercises/09-hamstring-curl.png",
+      "imageAlt": "Older adult holding a chair and bending one knee to bring the heel back"
     },
     {
-      "id": "23-wall-push-ups",
-      "category": "STRENGTH · PUSH",
-      "title": "Saturday 23-wall-push-ups",
-      "duration": "3 SETS · 8 REPS",
-      "instructions": "- Place your hands on a stable wall at chest height, slightly wider than your shoulders.\n- Step back to a comfortable angle and keep your body aligned.\n- Lower your chest toward the wall, then press away smoothly.\n- Keep the effort controlled and stop if you feel joint pain."
+      "id": "10-supported-march",
+      "category": "BALANCE · LEGS",
+      "title": "Supported standing march",
+      "duration": "2 SETS · 8–10 EACH SIDE",
+      "image": "images/exercises/10-supported-march.png",
+      "imageAlt": "Older adult holding a chair and gently lifting one knee for a supported march"
     },
     {
-      "id": "24-glute-bridges",
-      "category": "STRENGTH · HIPS",
-      "title": "Saturday 24-glute-bridges",
-      "duration": "2 SETS · 10 REPS",
-      "instructions": "- Lie on your back on a comfortable surface with knees bent and feet flat.\n- Gently tighten your stomach and press through your feet to lift your hips a little.\n- Pause briefly, then lower with control.\n- Keep the movement comfortable and skip it if getting down or up is difficult."
+      "id": "11-tandem-balance",
+      "category": "BALANCE",
+      "title": "Heel-to-toe balance",
+      "duration": "2–3 HOLDS · 10–20 SEC",
+      "image": "images/exercises/11-tandem-balance.png",
+      "imageAlt": "Older adult standing near a counter with one foot slightly in front of the other"
     },
     {
-      "id": "25-bird-dogs",
-      "category": "STRENGTH · CORE",
-      "title": "Saturday 25-bird-dogs",
-      "duration": "2 SETS · 6 EACH SIDE",
-      "instructions": "- Start on hands and knees on a comfortable surface, with hands under shoulders.\n- Slowly reach one leg back; if steady, reach the opposite arm forward.\n- Return to the start and switch sides.\n- Keep your back comfortably still; do only the version that feels stable."
+      "id": "12-supported-weight-shifts",
+      "category": "BALANCE",
+      "title": "Side-to-side weight shifts",
+      "duration": "2 SETS · 8–10 EACH SIDE",
+      "image": "images/exercises/11-tandem-balance.png",
+      "imageAlt": "Older adult holding a counter while shifting weight gently from one leg to the other"
     },
     {
-      "id": "26-breathing",
-      "category": "RECOVERY",
-      "title": "Sunday 26-breathing",
-      "duration": "3 MIN",
-      "instructions": "- Sit or lie in a comfortable position.\n- Let your breathing follow its natural rhythm.\n- Each time you notice your mind wandering, gently return your attention to the next breath.\n- There is no need to change or hold the breath."
-    },
-    {
-      "id": "27-joint-mobility",
-      "category": "RECOVERY · MOBILITY",
-      "title": "Sunday 27-joint-mobility",
-      "duration": "4 MIN",
-      "instructions": "- Move slowly through a few comfortable shoulder rolls.\n- Gently bend and straighten your elbows and knees.\n- Shift your weight from side to side while holding support if helpful.\n- Keep every movement easy and pain-free."
-    },
-    {
-      "id": "28-easy-walk",
-      "category": "RECOVERY · WALK",
-      "title": "Sunday 28-easy-walk",
-      "duration": "8 MIN",
-      "instructions": "- Take a relaxed walk on a comfortable, familiar route.\n- Keep the pace easy enough for conversation.\n- Pay attention to your surroundings and let your arms move naturally.\n- Shorten the walk or rest whenever you want."
-    },
-    {
-      "id": "29-reflection",
-      "category": "REFLECTION",
-      "title": "Sunday 29-reflection",
+      "id": "13-shoulder-mobility",
+      "category": "MOBILITY",
+      "title": "Easy shoulder mobility",
       "duration": "2 MIN",
-      "instructions": "- Pause somewhere comfortable.\n- Notice how your energy feels today.\n- Think of one movement you enjoyed this week and one thing you would like to adjust next week.\n- Keep the observation simple and kind."
+      "image": "images/exercises/13-shoulder-mobility.png",
+      "imageAlt": "Older adult seated and making comfortable shoulder and arm movements"
+    },
+    {
+      "id": "14-cool-down-walk",
+      "category": "COOLDOWN",
+      "title": "Easy cool-down walk",
+      "duration": "3 MIN",
+      "image": "images/exercises/14-cool-down-walk.png",
+      "imageAlt": "Older adult walking slowly indoors to cool down"
+    },
+    {
+      "id": "15-easy-walk",
+      "category": "AEROBIC · WALK",
+      "title": "Comfortable walk",
+      "duration": "10–25 MIN",
+      "image": "images/exercises/15-easy-walk.png",
+      "imageAlt": "Older adult walking at a comfortable pace on a level outdoor path"
     }
-  ]
+  ],
+  "instructionsFile": "instructions.md"
 }

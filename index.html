@@ -14,7 +14,7 @@
       <div class="day-heading" aria-live="polite">
         <span class="day-name" id="dayName">Loading</span>
         <span class="day-separator">·</span>
-        <h1 id="setName">Training plan</h1>
+        <h1 id="workoutName">Training plan</h1>
       </div>
       <button class="today-button" id="todayButton" type="button">Today</button>
       <button class="day-arrow" id="nextDay" type="button" aria-label="Next day">›</button>
@@ -23,10 +23,11 @@
       </button>
     </header>
 
-    <section class="workspace" aria-live="polite">
-      <aside class="session-rail">
-        <div class="rail-topline"><span class="rail-label">SELECTED TRAINING SET</span><span class="session-status"><i class="live-dot"></i><span id="statusText">Ready</span></span></div>
-        <div class="set-summary"><span id="railDay">MONDAY</span><strong id="railSet">Relaxing</strong></div>
+    <section class="workspace" id="workspace" aria-live="polite">
+      <aside class="session-rail" id="sessionRail">
+        <div class="rail-topline"><span class="rail-label">SELECTED WORKOUT</span><span class="session-status"><i class="live-dot"></i><span id="statusText">Ready</span></span><button class="rail-toggle" id="railToggle" type="button" aria-expanded="true" aria-controls="sessionRail" aria-label="Collapse side panel" title="Collapse side panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6M20 6l-6 6 6 6"/></svg></button></div>
+        <div class="set-summary"><span id="railDay">MONDAY</span><strong id="workoutNameRail">Everyday activity</strong><span class="workout-summary" id="workoutSummary"></span></div>
+        <p class="workout-description" id="workoutDescription"></p>
         <div class="session-controls">
           <button class="button button-start" id="startButton" type="button"><span aria-hidden="true">▶</span> Start module</button>
           <button class="button button-done" id="doneButton" type="button" hidden>Done <span aria-hidden="true">✓</span></button>
@@ -37,8 +38,8 @@
           </div>
         </div>
         <div class="rail-divider"></div>
-        <div class="module-list-head"><span class="rail-label">IN THIS SET</span><span class="module-count"><strong id="moduleNumber">01</strong> / <span id="moduleTotal">03</span></span></div>
-        <nav class="module-list" id="moduleList" aria-label="Modules in this training set"></nav>
+        <div class="module-list-head"><span class="rail-label">IN THIS WORKOUT</span><span class="module-count"><strong id="moduleNumber">01</strong> / <span id="moduleTotal">03</span></span></div>
+        <nav class="module-list" id="moduleList" aria-label="Modules in this workout"></nav>
         <div class="rail-bottom">
           <div class="set-progress"><span id="progressFill"></span></div>
           <div class="rail-actions">
@@ -54,9 +55,9 @@
           <span class="module-category"><span id="moduleCategory">LOADING</span><span class="module-id" id="moduleId">01-warmup</span></span>
           <span class="duration-tag" id="moduleDuration"></span>
         </div>
+        <h2 class="module-title" id="moduleTitle">Loading your training…</h2>
         <div class="module-content" id="moduleContent">
           <div class="module-copy">
-            <h2 id="moduleTitle">Loading your training…</h2>
             <section class="instructions-pane" aria-label="Module instructions">
               <div class="instructions-label">INSTRUCTIONS</div>
               <div class="markdown-content" id="moduleInstructions"></div>
@@ -65,7 +66,6 @@
           <div class="module-visual" id="visualColumn">
             <img class="module-image" id="moduleImage" alt="" hidden>
             <div class="visual-placeholder" id="visualPlaceholder" aria-hidden="true"><span id="visualIndex">01</span><i></i></div>
-            <span class="visual-caption" id="visualCaption">ONE MODULE AT A TIME</span>
           </div>
         </div>
       </article>
