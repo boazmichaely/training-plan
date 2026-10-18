@@ -10,14 +10,14 @@
 <body class="weekly-app">
   <main class="weekly-shell">
     <header class="week-header" id="weekHeader">
-      <button class="day-arrow" id="previousDay" type="button" aria-label="Previous day">‹</button>
       <div class="day-heading" aria-live="polite">
+        <button class="day-arrow" id="previousDay" type="button" aria-label="Previous day">‹</button>
         <span class="day-name" id="dayName">Loading</span>
+        <button class="day-arrow" id="nextDay" type="button" aria-label="Next day">›</button>
+        <button class="today-button" id="todayButton" type="button">Today</button>
         <span class="day-separator">·</span>
         <h1 id="workoutName">Training plan</h1>
       </div>
-      <button class="today-button" id="todayButton" type="button">Today</button>
-      <button class="day-arrow" id="nextDay" type="button" aria-label="Next day">›</button>
       <button class="icon-button" id="fullscreenButton" type="button" aria-label="Enter full screen" title="Enter full screen" aria-pressed="false">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path id="fullscreenGlyph" d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3"/></svg>
       </button>
