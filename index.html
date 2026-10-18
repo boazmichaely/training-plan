@@ -49,10 +49,11 @@
             <div class="session-controls">
               <button class="button module-toggle" id="moduleToggle" type="button" aria-pressed="false" aria-label="Start this module"><span class="module-toggle-icon" aria-hidden="true">▶</span><span id="moduleToggleText">Start</span></button>
               <div class="timer-panel timer-idle" id="timerPanel" aria-hidden="true">
-                <span class="timer-label">MODULE TIMER</span>
+                <span class="timer-label" id="timerLabel">MODULE TIMER</span>
                 <strong id="timerDisplay">00:00</strong>
                 <span class="timer-started" id="timerStarted"></span>
               </div>
+              <button class="end-intervals" id="endIntervals" type="button" hidden>End intervals</button>
             </div>
           </div>
         </div>
@@ -60,9 +61,15 @@
         <span class="module-repeat" id="moduleRepeat" hidden></span>
         <div class="module-content" id="moduleContent">
           <div class="module-copy">
-            <section class="instructions-pane" aria-label="Module instructions">
-              <div class="instructions-label">INSTRUCTIONS</div>
+            <section class="instructions-pane" id="instructionsPane" aria-label="Module instructions and timed steps">
+              <div class="instructions-label" id="instructionsLabel">INSTRUCTIONS</div>
               <div class="markdown-content" id="moduleInstructions"></div>
+              <section class="timed-sequence" id="timedSequence" aria-label="Timed steps in this round" hidden>
+                <div class="step-sequence-heading"><span id="stepPosition">STEP 01 / 06</span><span>THIS ROUND</span></div>
+                <div class="step-progress-track"><span id="stepProgressFill"></span></div>
+                <ol class="timed-step-list" id="timedStepList"></ol>
+                <span class="visually-hidden" id="stepAnnouncement" aria-live="polite"></span>
+              </section>
             </section>
           </div>
           <div class="module-visual" id="visualColumn">
@@ -79,6 +86,6 @@
     <div id="logEntries" class="log-entries"></div>
     <div class="dialog-foot"><span>Saved on this device</span><button id="clearLog" class="text-button" type="button">Clear log</button></div>
   </dialog>
-  <script src="app.js?v=2"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

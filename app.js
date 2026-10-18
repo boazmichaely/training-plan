@@ -1,7 +1,9 @@
 const $ = (id) => document.getElementById(id);
+const debugTimer = new URLSearchParams(window.location.search).get('debugTimer') === '1';
+const timerScale = debugTimer ? 0.1 : 1;
 const state = {
   days: [], workoutsById: new Map(), modulesById: new Map(), logs: [],
-  dayIndex: 0, moduleIndex: 0, startedAt: null, timerId: null,
+  dayIndex: 0, moduleIndex: 0, startedAt: null, timerId: null, timedSession: null,
 };
 
 function pad(value) { return String(value).padStart(2, '0'); }
@@ -12,20 +14,18 @@ function todayIndex() {
 }
 function currentDay() { return state.days[state.dayIndex]; }
 function currentWorkout() { return state.workoutsById.get(currentDay().workoutId); }
-function currentSteps() {
-  return currentWorkout().steps.flatMap((step) => {
-    const repeatCount = step.repeat || 1;
-    return Array.from({ length: repeatCount }, (_, index) => ({
-      module: state.modulesById.get(step.moduleId), repeatIndex: index + 1, repeatCount,
-    }));
-  });
-}
-function currentModules() { return currentSteps().map((step) => step.module); }
+function currentRefs() { return currentWorkout().modules; }
+function currentModules() { return currentRefs().map((ref) => state.modulesById.get(ref.moduleId)); }
 function currentModule() { return currentModules()[state.moduleIndex]; }
-function repeatDetails(steps, index) {
-  const step = steps[index];
-  return { round: step.repeatIndex, total: step.repeatCount };
+function repeatDetails(index) {
+  const total = currentRefs()[index]?.repeat || 1;
+  const session = state.timedSession;
+  return { round: session ? Math.min(session.totalRounds, Math.floor(elapsedMs(session) / session.roundMs) + 1) : 1, total };
 }
+function isTimed(module = currentModule()) { return Array.isArray(module?.steps) && module.steps.length > 0; }
+function elapsedMs(session) { return session.elapsedMs + (session.paused ? 0 : Math.max(0, Date.now() - session.runningSince)); }
+function stepDurationMs(step) { return step.durationSeconds * 1000 * timerScale; }
+function roundDuration(module = currentModule()) { return module.steps.reduce((sum, step) => sum + stepDurationMs(step), 0); }
 
 function parseInstructionSections(markdown) {
   const sections = new Map();
@@ -122,8 +122,8 @@ function renderInstructions(markdown) {
 function render() {
   const day = currentDay();
   const workout = currentWorkout();
-  const steps = currentSteps();
-  const modules = steps.map((step) => step.module);
+  const refs = currentRefs();
+  const modules = currentModules();
   const isToday = state.dayIndex === todayIndex();
   const module = modules[state.moduleIndex];
   $('weekHeader').classList.toggle('is-today', isToday);
@@ -141,15 +141,19 @@ function render() {
   $('moduleId').textContent = module.id;
   $('moduleTitle').textContent = module.title;
   renderInstructions(module.instructions);
-  const repeat = repeatDetails(steps, state.moduleIndex);
+  const timed = isTimed(module);
+  $('instructionsPane').classList.toggle('timed-mode', timed);
+  $('instructionsLabel').hidden = timed;
+  $('moduleInstructions').hidden = timed;
+  const repeat = repeatDetails(state.moduleIndex);
   $('moduleDuration').textContent = module.duration || '';
   $('moduleRepeat').hidden = repeat.total < 2;
   $('moduleRepeat').textContent = repeat.total > 1 ? `ROUND ${pad(repeat.round)} / ${pad(repeat.total)}` : '';
   $('moduleNumber').textContent = pad(state.moduleIndex + 1);
   $('moduleTotal').textContent = pad(modules.length);
   $('progressFill').style.width = `${((state.moduleIndex + 1) / modules.length) * 100}%`;
-  $('backButton').disabled = state.moduleIndex === 0 || Boolean(state.startedAt);
-  $('nextButton').disabled = state.moduleIndex === modules.length - 1 || Boolean(state.startedAt);
+  $('backButton').disabled = state.moduleIndex === 0;
+  $('nextButton').disabled = state.moduleIndex === modules.length - 1;
 
   const list = $('moduleList');
   list.replaceChildren(...modules.map((item, index) => {
@@ -157,7 +161,7 @@ function render() {
     button.type = 'button';
     button.className = `module-link${index === state.moduleIndex ? ' active' : ''}${index < state.moduleIndex ? ' visited' : ''}`;
     button.setAttribute('aria-current', index === state.moduleIndex ? 'step' : 'false');
-    button.disabled = Boolean(state.startedAt);
+    button.disabled = Boolean(state.timedSession?.saving);
     const number = document.createElement('span');
     number.className = 'module-link-number';
     number.textContent = item.id.split('-')[0];
@@ -165,10 +169,11 @@ function render() {
     text.className = 'module-link-text';
     const titlePrefix = `${day.label} ${item.id.split('-')[0]}-`;
     const title = item.title.startsWith(titlePrefix) ? item.title.slice(titlePrefix.length) : item.title;
-    const repeat = repeatDetails(steps, index);
-    text.textContent = repeat.total > 1 ? `Round ${repeat.round} of ${repeat.total} · ${title}` : title;
+    const repeat = repeatDetails(index);
+    const count = refs[index].repeat || 1;
+    text.textContent = count > 1 ? `${count} rounds · ${title}` : title;
     button.append(number, text);
-    button.addEventListener('click', () => { state.moduleIndex = index; render(); });
+    button.addEventListener('click', () => navigateModuleTo(index));
     return button;
   }));
 
@@ -189,20 +194,95 @@ function render() {
     $('visualIndex').textContent = pad(state.moduleIndex + 1);
   }
 
+  renderTimedSteps(module);
   const active = Boolean(state.startedAt);
   const toggle = $('moduleToggle');
-  toggle.classList.toggle('is-pressed', active);
-  toggle.setAttribute('aria-pressed', String(active));
-  toggle.setAttribute('aria-label', active ? 'Done and save this module' : 'Start this module');
-  $('moduleToggleText').textContent = active ? 'Done' : 'Start';
+  const paused = Boolean(state.timedSession?.paused);
+  toggle.classList.toggle('is-pressed', active && (!timed || !paused));
+  toggle.setAttribute('aria-pressed', String(active && (!timed || !paused)));
+  toggle.setAttribute('aria-label', active ? (timed ? (paused ? 'Resume intervals' : 'Pause intervals') : 'Done and save this module') : 'Start this module');
+  $('moduleToggleText').textContent = active ? (timed ? (paused ? 'Resume' : 'Pause') : 'Done') : 'Start';
+  $('moduleToggle').querySelector('.module-toggle-icon').textContent = active && timed ? (paused ? '▶' : 'Ⅱ') : active ? '✓' : '▶';
+  $('timerLabel').textContent = active && timed ? (debugTimer ? 'STEP TIMER · DEBUG ×0.1' : 'STEP TIMER') : 'MODULE TIMER';
+  $('endIntervals').hidden = !active || !timed;
+  if (active && timed) $('timerStarted').textContent = `Started ${state.startedAt.time}`;
   $('timerPanel').classList.toggle('timer-idle', !active);
   $('timerPanel').setAttribute('aria-hidden', String(!active));
   if (state.startedAt) updateTimer();
 }
 
+function renderTimedSteps(module) {
+  const panel = $('timedSequence');
+  const timed = isTimed(module);
+  panel.hidden = !timed;
+  if (!timed) { $('timedStepList').replaceChildren(); return; }
+  const list = $('timedStepList');
+  list.replaceChildren(...module.steps.map((step, index) => {
+    const item = document.createElement('li');
+    const stepType = step.type || 'movement';
+    item.className = `timed-step timed-step--${stepType}`;
+    item.dataset.stepIndex = index;
+    item.dataset.stepType = stepType;
+    const label = document.createElement('span');
+    label.className = 'timed-step-name';
+    label.textContent = step.label;
+    const duration = document.createElement('span');
+    duration.className = 'timed-step-duration';
+    duration.textContent = `${step.durationSeconds} sec`;
+    const type = document.createElement('span');
+    type.className = 'timed-step-type';
+    type.textContent = stepType === 'recovery' ? 'RECOVERY' : 'MOVEMENT';
+    const cue = document.createElement('small');
+    cue.textContent = step.instructions || '';
+    item.append(label, duration, type, cue);
+    return item;
+  }));
+  updateTimedDisplay();
+}
+
 function updateTimer() {
   if (!state.startedAt) return;
-  $('timerDisplay').textContent = mmss(Math.floor((Date.now() - state.startedAt.timestamp) / 1000));
+  if (state.timedSession) {
+    updateTimedDisplay();
+    if (!state.timedSession.paused) saveElapsedRounds();
+  } else $('timerDisplay').textContent = mmss(Math.floor((Date.now() - state.startedAt.timestamp) / 1000));
+}
+
+function updateTimedDisplay() {
+  const session = state.timedSession;
+  if (!session) return;
+  const module = currentModule();
+  const duration = session.roundMs;
+  const elapsed = elapsedMs(session);
+  const completedRounds = Math.floor(elapsed / duration);
+  const withinRound = elapsed % duration;
+  let cursor = 0;
+  let activeIndex = module.steps.length - 1;
+  for (let i = 0; i < module.steps.length; i += 1) {
+    cursor += stepDurationMs(module.steps[i]);
+    if (withinRound < cursor || completedRounds >= session.totalRounds) { activeIndex = i; break; }
+  }
+  const previousActive = session.activeStepIndex;
+  session.activeStepIndex = activeIndex;
+  let start = 0;
+  const items = [...$('timedStepList').children];
+  items.forEach((item, index) => {
+    const end = start + stepDurationMs(module.steps[index]);
+    item.classList.toggle('is-complete', completedRounds >= session.totalRounds || withinRound >= end);
+    item.classList.toggle('is-current', index === activeIndex && completedRounds < session.totalRounds);
+    item.classList.toggle('is-upcoming', index > activeIndex && completedRounds < session.totalRounds);
+    if (index === activeIndex && completedRounds < session.totalRounds) item.setAttribute('aria-current', 'step');
+    else item.removeAttribute('aria-current');
+    start = end;
+  });
+  if (previousActive !== activeIndex) $('stepAnnouncement').textContent = `Step ${activeIndex + 1} of ${module.steps.length}: ${module.steps[activeIndex].label}`;
+  const stepStart = module.steps.slice(0, activeIndex).reduce((sum, step) => sum + stepDurationMs(step), 0);
+  const stepElapsed = Math.max(0, withinRound - stepStart);
+  const remaining = Math.max(0, Math.ceil((stepDurationMs(module.steps[activeIndex]) - stepElapsed) / 1000));
+  $('timerDisplay').textContent = mmss(remaining);
+  $('stepPosition').textContent = completedRounds >= session.totalRounds ? 'ROUND COMPLETE' : `STEP ${pad(activeIndex + 1)} / ${pad(module.steps.length)}`;
+  $('moduleRepeat').textContent = `ROUND ${pad(Math.min(session.totalRounds, completedRounds + 1))} / ${pad(session.totalRounds)}`;
+  $('stepProgressFill').style.width = `${Math.min(100, (withinRound / duration) * 100)}%`;
 }
 
 function localDate(date) {
@@ -215,13 +295,17 @@ function start() {
   const day = currentDay();
   const workout = currentWorkout();
   const module = currentModule();
-  const repeat = repeatDetails(currentSteps(), state.moduleIndex);
+  const repeat = repeatDetails(state.moduleIndex);
   state.startedAt = {
     timestamp: now.getTime(), date: localDate(now),
     time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
     moduleId: module.id, module: module.title,
-    moduleRound: repeat.total > 1 ? repeat.round : null, moduleRoundTotal: repeat.total > 1 ? repeat.total : null,
+    moduleRound: null, moduleRoundTotal: repeat.total > 1 ? repeat.total : null,
     workoutId: workout.id, workoutName: workout.name, workoutDay: day.label,
+  };
+  if (isTimed(module)) state.timedSession = {
+    totalRounds: repeat.total, roundMs: roundDuration(module), elapsedMs: 0, runningSince: now.getTime(),
+    paused: false, nextRoundToLog: 0, saving: false, activeStepIndex: -1,
   };
   $('statusText').textContent = 'In progress';
   $('timerStarted').textContent = `Started ${state.startedAt.time}`;
@@ -229,8 +313,9 @@ function start() {
   render();
 }
 
-async function done() {
+async function done(targetIndex = null) {
   if (!state.startedAt) return;
+  if (state.timedSession) { toggleTimedPause(); return; }
   const elapsed = Math.max(0, Math.floor((Date.now() - state.startedAt.timestamp) / 1000));
   const entry = {
     workoutId: state.startedAt.workoutId, workoutName: state.startedAt.workoutName, workoutDay: state.startedAt.workoutDay,
@@ -254,13 +339,115 @@ async function done() {
   clearInterval(state.timerId);
   state.timerId = null;
   state.startedAt = null;
-  const hasNextModule = state.moduleIndex < currentModules().length - 1;
-  if (hasNextModule) state.moduleIndex += 1;
-  $('statusText').textContent = hasNextModule ? 'Session saved · Next module' : 'Workout complete';
+  finishCurrentModule(targetIndex === null ? 'Session saved · Next module' : 'Module saved · Selected module', targetIndex);
+}
+
+function finishCurrentModule(message, targetIndex = null) {
+  clearInterval(state.timerId); state.timerId = null; state.startedAt = null; state.timedSession = null;
+  const hasNext = state.moduleIndex < currentModules().length - 1;
+  if (targetIndex !== null) state.moduleIndex = targetIndex;
+  else if (hasNext) state.moduleIndex += 1;
+  $('statusText').textContent = targetIndex !== null ? message : hasNext ? message : 'Workout complete';
   render();
 }
 
+function toggleTimedPause() {
+  const session = state.timedSession;
+  if (!session || session.saving) return;
+  if (!session.paused) {
+    session.elapsedMs = elapsedMs(session); session.paused = true;
+    $('statusText').textContent = 'Intervals paused';
+  } else {
+    session.runningSince = Date.now(); session.paused = false;
+    $('statusText').textContent = 'Intervals in progress';
+    saveElapsedRounds();
+  }
+  render();
+}
+
+async function saveElapsedRounds() {
+  const session = state.timedSession;
+  if (!session || session.saving) return;
+  const completed = Math.min(session.totalRounds, Math.floor(elapsedMs(session) / session.roundMs));
+  if (completed <= session.nextRoundToLog) return;
+  if (debugTimer) {
+    session.nextRoundToLog = completed;
+    if (completed >= session.totalRounds) finishCurrentModule('Debug intervals complete · no log saved');
+    else render();
+    return;
+  }
+  session.saving = true;
+  session.saveFailed = false;
+  try {
+    while (session.nextRoundToLog < completed) {
+      const round = session.nextRoundToLog + 1;
+      const startDate = new Date(state.startedAt.timestamp + (round - 1) * session.roundMs);
+      const entry = {
+        workoutId: state.startedAt.workoutId, workoutName: state.startedAt.workoutName, workoutDay: state.startedAt.workoutDay,
+        moduleId: state.startedAt.moduleId, module: state.startedAt.module,
+        moduleRound: round, moduleRoundTotal: session.totalRounds,
+        date: localDate(startDate), startTime: startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        duration: mmss(Math.floor(session.roundMs / 1000)), seconds: Math.floor(session.roundMs / 1000),
+      };
+      const response = await fetch('/api/logs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry) });
+      if (!response.ok) throw new Error('The log file could not be updated.');
+      state.logs = (await response.json()).logs; session.nextRoundToLog += 1; updateLogCount();
+    }
+  } catch (error) {
+    session.elapsedMs = elapsedMs(session); session.paused = true;
+    session.saveFailed = true;
+    $('statusText').textContent = 'Could not save round — paused';
+    console.error(error);
+  } finally { session.saving = false; }
+  if (state.timedSession === session && session.nextRoundToLog >= session.totalRounds) {
+    if (session.navigationTarget !== undefined) {
+      finishCurrentModule('Intervals saved · Selected module', session.navigationTarget);
+    } else {
+      $('statusText').textContent = 'Intervals complete · Next module';
+      finishCurrentModule('Intervals complete · Next module');
+    }
+  } else render();
+}
+
+async function endIntervals(targetIndex = null) {
+  const session = state.timedSession;
+  if (!session || session.saving) return;
+  session.elapsedMs = elapsedMs(session);
+  session.paused = true;
+  if (targetIndex !== null) session.navigationTarget = targetIndex;
+  else delete session.navigationTarget;
+  const elapsed = session.elapsedMs;
+  if (debugTimer) { finishCurrentModule(targetIndex === null ? 'Debug intervals ended · no log saved' : 'Debug intervals ended · selected module', targetIndex); return; }
+  await saveElapsedRounds();
+  if (state.timedSession !== session) return;
+  if (session.saveFailed) { delete session.navigationTarget; $('statusText').textContent = 'Could not save round — paused'; render(); return; }
+  const roundStartOffset = session.nextRoundToLog * session.roundMs;
+  const partialMs = Math.max(0, elapsed - roundStartOffset);
+  if (partialMs >= 1000) {
+    const startDate = new Date(state.startedAt.timestamp + roundStartOffset);
+    const seconds = Math.floor(partialMs / 1000);
+    const entry = {
+      workoutId: state.startedAt.workoutId, workoutName: state.startedAt.workoutName, workoutDay: state.startedAt.workoutDay,
+      moduleId: state.startedAt.moduleId, module: state.startedAt.module,
+      moduleRound: session.nextRoundToLog + 1, moduleRoundTotal: session.totalRounds, partial: true,
+      date: localDate(startDate), startTime: startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      duration: mmss(seconds), seconds,
+    };
+    try {
+      const response = await fetch('/api/logs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry) });
+      if (!response.ok) throw new Error('The log file could not be updated.');
+      state.logs = (await response.json()).logs; updateLogCount();
+    } catch (error) {
+      $('statusText').textContent = 'Could not save log — try again';
+      console.error(error);
+      return;
+    }
+  }
+  finishCurrentModule(targetIndex === null ? 'Intervals ended · Next module' : 'Intervals ended · Selected module', targetIndex);
+}
+
 function navigateDay(delta) {
+  if (state.startedAt) return;
   state.dayIndex = (state.dayIndex + delta + state.days.length) % state.days.length;
   state.moduleIndex = 0;
   $('statusText').textContent = state.startedAt ? 'In progress' : 'Ready';
@@ -270,8 +457,15 @@ function navigateDay(delta) {
 function navigateModule(delta) {
   const target = state.moduleIndex + delta;
   if (target < 0 || target >= currentModules().length) return;
+  navigateModuleTo(target);
+}
+
+async function navigateModuleTo(target) {
+  if (target < 0 || target >= currentModules().length || target === state.moduleIndex) return;
+  if (state.timedSession) { await endIntervals(target); return; }
+  if (state.startedAt) { await done(target); return; }
   state.moduleIndex = target;
-  if (!state.startedAt) $('statusText').textContent = 'Ready';
+  $('statusText').textContent = 'Ready';
   render();
 }
 
@@ -297,7 +491,7 @@ function renderLog() {
     const module = document.createElement('span');
     module.className = 'log-module';
     module.textContent = entry.moduleRound && entry.moduleRoundTotal
-      ? `${entry.module || ''} · Round ${entry.moduleRound}/${entry.moduleRoundTotal}`
+      ? `${entry.module || ''} · Round ${entry.moduleRound}/${entry.moduleRoundTotal}${entry.partial ? ' · Partial' : ''}`
       : entry.module || '';
     const meta = document.createElement('span');
     meta.textContent = `${entry.date || ''} · Started ${entry.startTime || ''}`;
@@ -334,10 +528,11 @@ async function init() {
     state.days = data.days;
     for (const day of state.days) {
       const workout = state.workoutsById.get(day.workoutId);
-      const expandedCount = Array.isArray(workout?.steps) ? workout.steps.reduce((total, step) => total + (step.repeat || 1), 0) : 0;
-      if (!Array.isArray(workout?.steps) || !workout.steps.length || expandedCount > 16) throw new Error(`The ${day.label} workout must expand to between one and sixteen module steps.`);
-      if (workout.steps.some((step) => !state.modulesById.has(step.moduleId) || !Number.isInteger(step.repeat || 1) || (step.repeat || 1) < 1)) throw new Error(`The ${day.label} workout has an invalid or missing module step.`);
+      const refs = workout?.modules;
+      if (!Array.isArray(refs) || !refs.length || refs.length > 16) throw new Error(`The ${day.label} workout must contain between one and sixteen modules.`);
+      if (refs.some((ref) => !state.modulesById.has(ref.moduleId) || !Number.isInteger(ref.repeat || 1) || (ref.repeat || 1) < 1)) throw new Error(`The ${day.label} workout has an invalid or missing module reference.`);
     }
+    for (const module of state.modulesById.values()) if (module.steps && (!module.steps.length || module.steps.some((step) => !step.label || !['movement', 'recovery'].includes(step.type) || !Number.isInteger(step.durationSeconds) || step.durationSeconds < 1))) throw new Error(`Module ${module.id} has invalid timed steps. Use type "movement" or "recovery" and a positive durationSeconds value.`);
     state.logs = await logsResponse.json();
     // Import any sessions saved by the earlier browser-only version if the local file is empty.
     if (state.logs.length === 0) {
@@ -364,7 +559,12 @@ async function init() {
   }
 }
 
-$('moduleToggle').addEventListener('click', () => { if (state.startedAt) done(); else start(); });
+$('moduleToggle').addEventListener('click', () => {
+  if (!state.startedAt) start();
+  else if (state.timedSession) toggleTimedPause();
+  else done();
+});
+$('endIntervals').addEventListener('click', endIntervals);
 $('railToggle').addEventListener('click', () => {
   const collapsed = !$('workspace').classList.contains('rail-collapsed');
   $('workspace').classList.toggle('rail-collapsed', collapsed);

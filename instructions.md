@@ -92,18 +92,6 @@
 - Stretch
 
 ## 16-indoor-cardio-a
-- **30 second each:**
-  1. Side steps
-  2. Marching
-  3. Heel curls
-  4. Step-touch with relaxed arm swings
-  5. Repeat your preferred move
-- March easily for **30 seconds**. Let your breathing settle.
-- **1 round × (2½ min brisk + 30 sec easy).**
 
 ## 17-indoor-cardio-b
-- Keep a sturdy counter nearby. Face forward and use small, quiet steps.
-- Move briskly for **2½ minutes**: 30 seconds each of forward toe taps, side steps, supported marching, and heel digs with relaxed reaches. Repeat your preferred move for the last 30 seconds.
-- Then march easily for **30 seconds**. Let your breathing settle.
-- **1 round × (2½ min brisk + 30 sec easy).**
 

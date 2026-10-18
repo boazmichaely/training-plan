@@ -421,3 +421,46 @@ body.weekly-app{height:100dvh;min-height:620px;overflow:hidden;background:#f4f6f
 /* Keep nested movement lists compact and visibly subordinate. */
 .markdown-content ul ul,.markdown-content ul ol,.markdown-content ol ul,.markdown-content ol ol{margin:.3em 0 .45em;padding-left:1.5em}
 .markdown-content li li+li{margin-top:.3em}
+
+/* Timed module steps */
+.timed-sequence{margin-top:clamp(14px,2vh,24px);padding-top:14px;border-top:1px solid #dfe4ff}
+.step-sequence-heading{display:flex;justify-content:space-between;align-items:center;color:#4057d8;font:700 11px 'DM Mono',monospace;letter-spacing:.1em}
+.step-sequence-heading span+span{color:#8993bd;font-size:9px}
+.step-progress-track{height:5px;margin:10px 0 12px;border-radius:9px;background:#e6e9f8;overflow:hidden}
+.step-progress-track span{display:block;height:100%;width:0;background:#caff3d;transition:width .2s linear}
+.timed-step-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0;padding:0;list-style:none}
+.timed-step{position:relative;min-height:66px;padding:9px 10px;border:1px solid #e1e5f8;border-radius:9px;background:#fff;color:#7480a4;transition:background .18s,border-color .18s,box-shadow .18s}
+.timed-step-name{display:block;font-size:12px;font-weight:700;color:#34406d}
+.timed-step-duration{position:absolute;right:9px;top:9px;color:#8892b0;font:10px 'DM Mono',monospace}
+.timed-step-type{display:inline-block;margin-top:5px;padding:2px 5px;border-radius:999px;background:#edf0ff;color:#5566be;font:700 8px 'DM Mono',monospace;letter-spacing:.08em}
+.timed-step--recovery .timed-step-type{background:#eaf5d9;color:#607d20}
+.timed-step small{display:block;margin-top:5px;padding-right:36px;font-size:10px;line-height:1.35;color:#8992ad}
+.timed-step.is-current{border:2px solid #e0b500;background:#ffff90;box-shadow:0 0 0 3px #ffd90072,0 8px 20px #c9a60038}
+.timed-step.is-current .timed-step-name{color:#263509}
+.timed-step.is-current .timed-step-type{background:#ffe37a;color:#594500}
+.timed-step.is-current small{color:#5b542d}
+.timed-step.is-complete{border-color:#c8d5b0;background:#f7f9f2}
+.timed-step.is-complete .timed-step-name::before{content:'✓ ';color:#739b13}
+.end-intervals{align-self:center;border:0;background:none;color:#59649a;font:600 11px 'DM Sans',sans-serif;text-decoration:underline;cursor:pointer}
+.end-intervals[hidden]{display:none}
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:780px){.timed-step-list{grid-template-columns:repeat(2,minmax(0,1fr))}.timed-step{min-height:61px}}
+@media(max-width:480px){.timed-step-list{grid-template-columns:1fr}.timed-step{min-height:auto}.timed-step small{font-size:11px}}
+
+/* Timed modules use the whole instruction pane for their step cards. */
+.instructions-pane.timed-mode{display:flex;flex-direction:column;overflow:hidden;padding:clamp(16px,1.8vw,26px)}
+.instructions-pane.timed-mode .timed-sequence{display:flex;flex:1;flex-direction:column;min-height:0;margin:0;padding:0;border:0}
+.instructions-pane.timed-mode .step-sequence-heading,.instructions-pane.timed-mode .step-progress-track{flex:none}
+.instructions-pane.timed-mode .timed-step-list{flex:1;grid-template-rows:repeat(2,minmax(0,1fr));gap:clamp(8px,1vh,14px)}
+.instructions-pane.timed-mode .timed-step{display:flex;min-height:0;flex-direction:column;justify-content:center;padding:clamp(12px,1.5vw,22px)}
+.instructions-pane.timed-mode .timed-step-name{font-size:clamp(18px,1.45vw,25px);line-height:1.12}
+.instructions-pane.timed-mode .timed-step small{margin-top:9px;padding-right:0;font-size:clamp(12px,.92vw,16px);line-height:1.4}
+.instructions-pane.timed-mode .timed-step-type{margin-top:9px;font-size:9px}
+@media(max-width:780px){
+  .instructions-pane.timed-mode{overflow:visible;margin-top:15px;padding:14px}
+  .instructions-pane.timed-mode .timed-sequence{flex:none}
+  .instructions-pane.timed-mode .timed-step-list{flex:none;grid-template-rows:auto}
+  .instructions-pane.timed-mode .timed-step{min-height:90px}
+  .instructions-pane.timed-mode .timed-step-name{font-size:17px}
+  .instructions-pane.timed-mode .timed-step small{font-size:12px}
+}

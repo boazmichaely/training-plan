@@ -43,7 +43,7 @@
       "name": "Indoor Cardio A",
       "summary": "Indoor intervals · 30–42 min",
       "description": "Start with 8 rounds. Add one round when comfortable, up to 12.",
-      "steps": [
+      "modules": [
         {
           "moduleId": "01-warmup"
         },
@@ -61,7 +61,7 @@
       "name": "Indoor Cardio B",
       "summary": "Indoor intervals · 30–42 min",
       "description": "Start with 8 rounds. Add one round when comfortable, up to 12.",
-      "steps": [
+      "modules": [
         {
           "moduleId": "01-warmup"
         },
@@ -79,7 +79,7 @@
       "name": "Cardio and balance",
       "summary": "Cardio + balance · 30–42 min",
       "description": "Start with 8 rounds. Add one when comfortable, up to 12. Finish with balance.",
-      "steps": [
+      "modules": [
         {
           "moduleId": "01-warmup"
         },
@@ -103,7 +103,7 @@
       "name": "Strength A",
       "summary": "Home strength · about 30 min",
       "description": "Use controlled resistance that makes the final reps challenging. Progress gradually.",
-      "steps": [
+      "modules": [
         {
           "moduleId": "01-warmup"
         },
@@ -129,7 +129,7 @@
       "name": "Strength B",
       "summary": "Home strength · about 30 min",
       "description": "Use controlled resistance that makes the final reps challenging. Progress gradually.",
-      "steps": [
+      "modules": [
         {
           "moduleId": "01-warmup"
         },
@@ -158,7 +158,7 @@
       "name": "Cardio and balance",
       "summary": "Cardio + balance · 30–42 min",
       "description": "Start with 8 rounds. Add one when comfortable, up to 12. Finish with balance.",
-      "steps": [
+      "modules": [
         {
           "moduleId": "01-warmup"
         },
@@ -305,7 +305,15 @@
       "title": "Low-impact interval · A",
       "duration": "3 MIN",
       "image": "images/exercises/01-warmup.png",
-      "imageAlt": "Older adult gently marching in place beside a sturdy chair"
+      "imageAlt": "Older adult gently marching in place beside a sturdy chair",
+      "steps": [
+        { "type": "movement", "label": "Side steps", "durationSeconds": 30, "instructions": "Step gently side to side." },
+        { "type": "movement", "label": "Marching", "durationSeconds": 30, "instructions": "March in place at a brisk, comfortable pace." },
+        { "type": "movement", "label": "Heel curls", "durationSeconds": 30, "instructions": "Bring each heel gently toward the back." },
+        { "type": "movement", "label": "Step-touch", "durationSeconds": 30, "instructions": "Step-touch with relaxed arm swings." },
+        { "type": "movement", "label": "Your choice", "durationSeconds": 30, "instructions": "Repeat a comfortable brisk move." },
+        { "type": "recovery", "label": "Easy march", "durationSeconds": 30, "instructions": "Slow down and let your breathing settle." }
+      ]
     },
     {
       "id": "17-indoor-cardio-b",
@@ -313,7 +321,15 @@
       "title": "Low-impact interval · B",
       "duration": "3 MIN",
       "image": "images/exercises/01-warmup.png",
-      "imageAlt": "Older adult gently marching in place beside a sturdy chair"
+      "imageAlt": "Older adult gently marching in place beside a sturdy chair",
+      "steps": [
+        { "type": "movement", "label": "Forward toe taps", "durationSeconds": 30, "instructions": "Tap one toe forward, alternating sides." },
+        { "type": "movement", "label": "Side steps", "durationSeconds": 30, "instructions": "Step gently side to side." },
+        { "type": "movement", "label": "Supported march", "durationSeconds": 30, "instructions": "March in place; use the counter as needed." },
+        { "type": "movement", "label": "Heel digs", "durationSeconds": 30, "instructions": "Reach gently as you place each heel forward." },
+        { "type": "movement", "label": "Your choice", "durationSeconds": 30, "instructions": "Repeat a comfortable brisk move." },
+        { "type": "recovery", "label": "Easy march", "durationSeconds": 30, "instructions": "Slow down and let your breathing settle." }
+      ]
     }
   ],
   "instructionsFile": "instructions.md"
