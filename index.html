@@ -37,7 +37,6 @@
             <button class="rail-nav" id="backButton" type="button" aria-label="Previous module">← Back</button>
             <button class="rail-nav" id="nextButton" type="button" aria-label="Next module">Next →</button>
           </div>
-          <button class="log-button" id="logToggle" type="button"><span>Session log</span><span class="log-count" id="logCount">0</span></button>
         </div>
       </aside>
 
@@ -51,7 +50,6 @@
               <div class="timer-panel timer-idle" id="timerPanel" aria-hidden="true">
                 <span class="timer-label" id="timerLabel">MODULE TIMER</span>
                 <strong id="timerDisplay">00:00</strong>
-                <span class="timer-started" id="timerStarted"></span>
               </div>
               <button class="end-intervals" id="endIntervals" type="button" hidden>End intervals</button>
             </div>
@@ -81,11 +79,6 @@
     </section>
   </main>
 
-  <dialog id="logDialog" class="log-dialog">
-    <div class="dialog-head"><div><span class="module-category">YOUR PRACTICE</span><h2>Session log</h2></div><button class="close-button" id="closeLog" type="button" aria-label="Close log">×</button></div>
-    <div id="logEntries" class="log-entries"></div>
-    <div class="dialog-foot"><span>Saved on this device</span><button id="clearLog" class="text-button" type="button">Clear log</button></div>
-  </dialog>
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

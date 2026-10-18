@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 const debugTimer = new URLSearchParams(window.location.search).get('debugTimer') === '1';
 const timerScale = debugTimer ? 0.1 : 1;
 const state = {
-  days: [], workoutsById: new Map(), modulesById: new Map(), logs: [],
+  days: [], workoutsById: new Map(), modulesById: new Map(),
   dayIndex: 0, moduleIndex: 0, startedAt: null, timerId: null, timedSession: null,
 };
 
@@ -161,7 +161,6 @@ function render() {
     button.type = 'button';
     button.className = `module-link${index === state.moduleIndex ? ' active' : ''}${index < state.moduleIndex ? ' visited' : ''}`;
     button.setAttribute('aria-current', index === state.moduleIndex ? 'step' : 'false');
-    button.disabled = Boolean(state.timedSession?.saving);
     const number = document.createElement('span');
     number.className = 'module-link-number';
     number.textContent = item.id.split('-')[0];
@@ -185,12 +184,11 @@ function render() {
   const paused = Boolean(state.timedSession?.paused);
   toggle.classList.toggle('is-pressed', active && (!timed || !paused));
   toggle.setAttribute('aria-pressed', String(active && (!timed || !paused)));
-  toggle.setAttribute('aria-label', active ? (timed ? (paused ? 'Resume intervals' : 'Pause intervals') : 'Done and save this module') : 'Start this module');
+  toggle.setAttribute('aria-label', active ? (timed ? (paused ? 'Resume intervals' : 'Pause intervals') : 'Done with this module') : 'Start this module');
   $('moduleToggleText').textContent = active ? (timed ? (paused ? 'Resume' : 'Pause') : 'Done') : 'Start';
   $('moduleToggle').querySelector('.module-toggle-icon').textContent = active && timed ? (paused ? '▶' : 'Ⅱ') : active ? '✓' : '▶';
   $('timerLabel').textContent = active && timed ? (debugTimer ? 'STEP TIMER · DEBUG ×0.1' : 'STEP TIMER') : 'MODULE TIMER';
   $('endIntervals').hidden = !active || !timed;
-  if (active && timed) $('timerStarted').textContent = `Started ${state.startedAt.time}`;
   $('timerPanel').classList.toggle('timer-idle', !active);
   $('timerPanel').setAttribute('aria-hidden', String(!active));
   if (state.startedAt) updateTimer();
@@ -292,61 +290,29 @@ function updateTimedDisplay() {
   $('stepProgressFill').style.width = `${Math.min(100, (withinRound / duration) * 100)}%`;
 }
 
-function localDate(date) {
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-
 function start() {
   if (state.startedAt) return;
-  const now = new Date();
-  const day = currentDay();
-  const workout = currentWorkout();
   const module = currentModule();
   const repeat = repeatDetails(state.moduleIndex);
   state.startedAt = {
-    timestamp: now.getTime(), date: localDate(now),
-    time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-    moduleId: module.id, module: module.title,
-    moduleRound: null, moduleRoundTotal: repeat.total > 1 ? repeat.total : null,
-    workoutId: workout.id, workoutName: workout.name, workoutDay: day.label,
+    timestamp: Date.now(),
   };
   if (isTimed(module)) state.timedSession = {
-    totalRounds: repeat.total, roundMs: roundDuration(module), elapsedMs: 0, runningSince: now.getTime(),
-    paused: false, nextRoundToLog: 0, saving: false, activeStepIndex: -1,
+    totalRounds: repeat.total, roundMs: roundDuration(module), elapsedMs: 0, runningSince: Date.now(),
+    paused: false, completedRounds: 0, activeStepIndex: -1,
   };
   $('statusText').textContent = 'In progress';
-  $('timerStarted').textContent = `Started ${state.startedAt.time}`;
   state.timerId = window.setInterval(updateTimer, 250);
   render();
 }
 
-async function done(targetIndex = null) {
+function done(targetIndex = null) {
   if (!state.startedAt) return;
   if (state.timedSession) { toggleTimedPause(); return; }
-  const elapsed = Math.max(0, Math.floor((Date.now() - state.startedAt.timestamp) / 1000));
-  const entry = {
-    workoutId: state.startedAt.workoutId, workoutName: state.startedAt.workoutName, workoutDay: state.startedAt.workoutDay,
-    moduleId: state.startedAt.moduleId, module: state.startedAt.module,
-    moduleRound: state.startedAt.moduleRound, moduleRoundTotal: state.startedAt.moduleRoundTotal,
-    date: state.startedAt.date, startTime: state.startedAt.time,
-    duration: mmss(elapsed), seconds: elapsed,
-  };
-  try {
-    const response = await fetch('/api/logs', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry),
-    });
-    if (!response.ok) throw new Error('The log file could not be updated.');
-    state.logs = (await response.json()).logs;
-    updateLogCount();
-  } catch (error) {
-    $('statusText').textContent = 'Could not save log — try Done again';
-    console.error(error);
-    return;
-  }
   clearInterval(state.timerId);
   state.timerId = null;
   state.startedAt = null;
-  finishCurrentModule(targetIndex === null ? 'Session saved · Next module' : 'Module saved · Selected module', targetIndex);
+  finishCurrentModule(targetIndex === null ? 'Module complete · Next module' : 'Module complete · Selected module', targetIndex);
 }
 
 function finishCurrentModule(message, targetIndex = null) {
@@ -360,7 +326,7 @@ function finishCurrentModule(message, targetIndex = null) {
 
 function toggleTimedPause() {
   const session = state.timedSession;
-  if (!session || session.saving) return;
+  if (!session) return;
   if (!session.paused) {
     session.elapsedMs = elapsedMs(session); session.paused = true;
     $('statusText').textContent = 'Intervals paused';
@@ -374,39 +340,11 @@ function toggleTimedPause() {
 
 async function saveElapsedRounds() {
   const session = state.timedSession;
-  if (!session || session.saving) return;
+  if (!session) return;
   const completed = Math.min(session.totalRounds, Math.floor(elapsedMs(session) / session.roundMs));
-  if (completed <= session.nextRoundToLog) return;
-  if (debugTimer) {
-    session.nextRoundToLog = completed;
-    if (completed >= session.totalRounds) finishCurrentModule('Debug intervals complete · no log saved');
-    else render();
-    return;
-  }
-  session.saving = true;
-  session.saveFailed = false;
-  try {
-    while (session.nextRoundToLog < completed) {
-      const round = session.nextRoundToLog + 1;
-      const startDate = new Date(state.startedAt.timestamp + (round - 1) * session.roundMs);
-      const entry = {
-        workoutId: state.startedAt.workoutId, workoutName: state.startedAt.workoutName, workoutDay: state.startedAt.workoutDay,
-        moduleId: state.startedAt.moduleId, module: state.startedAt.module,
-        moduleRound: round, moduleRoundTotal: session.totalRounds,
-        date: localDate(startDate), startTime: startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-        duration: mmss(Math.floor(session.roundMs / 1000)), seconds: Math.floor(session.roundMs / 1000),
-      };
-      const response = await fetch('/api/logs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry) });
-      if (!response.ok) throw new Error('The log file could not be updated.');
-      state.logs = (await response.json()).logs; session.nextRoundToLog += 1; updateLogCount();
-    }
-  } catch (error) {
-    session.elapsedMs = elapsedMs(session); session.paused = true;
-    session.saveFailed = true;
-    $('statusText').textContent = 'Could not save round — paused';
-    console.error(error);
-  } finally { session.saving = false; }
-  if (state.timedSession === session && session.nextRoundToLog >= session.totalRounds) {
+  if (completed <= session.completedRounds) return;
+  session.completedRounds = completed;
+  if (completed >= session.totalRounds) {
     if (session.navigationTarget !== undefined) {
       finishCurrentModule('Intervals saved · Selected module', session.navigationTarget);
     } else {
@@ -418,38 +356,13 @@ async function saveElapsedRounds() {
 
 async function endIntervals(targetIndex = null) {
   const session = state.timedSession;
-  if (!session || session.saving) return;
+  if (!session) return;
   session.elapsedMs = elapsedMs(session);
   session.paused = true;
   if (targetIndex !== null) session.navigationTarget = targetIndex;
   else delete session.navigationTarget;
-  const elapsed = session.elapsedMs;
-  if (debugTimer) { finishCurrentModule(targetIndex === null ? 'Debug intervals ended · no log saved' : 'Debug intervals ended · selected module', targetIndex); return; }
-  await saveElapsedRounds();
+  saveElapsedRounds();
   if (state.timedSession !== session) return;
-  if (session.saveFailed) { delete session.navigationTarget; $('statusText').textContent = 'Could not save round — paused'; render(); return; }
-  const roundStartOffset = session.nextRoundToLog * session.roundMs;
-  const partialMs = Math.max(0, elapsed - roundStartOffset);
-  if (partialMs >= 1000) {
-    const startDate = new Date(state.startedAt.timestamp + roundStartOffset);
-    const seconds = Math.floor(partialMs / 1000);
-    const entry = {
-      workoutId: state.startedAt.workoutId, workoutName: state.startedAt.workoutName, workoutDay: state.startedAt.workoutDay,
-      moduleId: state.startedAt.moduleId, module: state.startedAt.module,
-      moduleRound: session.nextRoundToLog + 1, moduleRoundTotal: session.totalRounds, partial: true,
-      date: localDate(startDate), startTime: startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-      duration: mmss(seconds), seconds,
-    };
-    try {
-      const response = await fetch('/api/logs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry) });
-      if (!response.ok) throw new Error('The log file could not be updated.');
-      state.logs = (await response.json()).logs; updateLogCount();
-    } catch (error) {
-      $('statusText').textContent = 'Could not save log — try again';
-      console.error(error);
-      return;
-    }
-  }
   finishCurrentModule(targetIndex === null ? 'Intervals ended · Next module' : 'Intervals ended · Selected module', targetIndex);
 }
 
@@ -476,45 +389,10 @@ async function navigateModuleTo(target) {
   render();
 }
 
-function updateLogCount() { $('logCount').textContent = state.logs.length; }
-
-function renderLog() {
-  const container = $('logEntries');
-  container.replaceChildren();
-  if (!state.logs.length) {
-    const empty = document.createElement('div');
-    empty.className = 'empty-log';
-    empty.textContent = 'Completed sessions will appear here across all training days.';
-    container.append(empty);
-    return;
-  }
-  for (const entry of state.logs) {
-    const row = document.createElement('div');
-    row.className = 'log-entry';
-    const set = document.createElement('strong');
-    const workoutName = entry.workoutName || entry.setName;
-    const workoutDay = entry.workoutDay || entry.setDay;
-    set.textContent = workoutName ? `${workoutDay || ''} · ${workoutName}` : 'Training session';
-    const module = document.createElement('span');
-    module.className = 'log-module';
-    module.textContent = entry.moduleRound && entry.moduleRoundTotal
-      ? `${entry.module || ''} · Round ${entry.moduleRound}/${entry.moduleRoundTotal}${entry.partial ? ' · Partial' : ''}`
-      : entry.module || '';
-    const meta = document.createElement('span');
-    meta.textContent = `${entry.date || ''} · Started ${entry.startTime || ''}`;
-    const duration = document.createElement('span');
-    duration.className = 'log-duration';
-    duration.textContent = entry.duration || '';
-    row.append(set, module, meta, duration);
-    container.append(row);
-  }
-}
-
 async function init() {
   try {
-    const [planResponse, logsResponse] = await Promise.all([fetch('./modules.json'), fetch('/api/logs')]);
+    const planResponse = await fetch('./modules.json');
     if (!planResponse.ok) throw new Error('Could not load modules.json');
-    if (!logsResponse.ok) throw new Error('Could not load session-log.json');
     const data = await planResponse.json();
     if (!Array.isArray(data.days) || data.days.length !== 7) throw new Error('modules.json must define all seven weekdays.');
     if (!Array.isArray(data.workouts) || !Array.isArray(data.modules)) throw new Error('modules.json must define workouts and modules.');
@@ -540,22 +418,7 @@ async function init() {
       if (refs.some((ref) => !state.modulesById.has(ref.moduleId) || !Number.isInteger(ref.repeat || 1) || (ref.repeat || 1) < 1)) throw new Error(`The ${day.label} workout has an invalid or missing module reference.`);
     }
     for (const module of state.modulesById.values()) if (module.steps && (!module.steps.length || module.steps.some((step) => !step.label || !['movement', 'recovery'].includes(step.type) || !Number.isInteger(step.durationSeconds) || step.durationSeconds < 1))) throw new Error(`Module ${module.id} has invalid timed steps. Use type "movement" or "recovery" and a positive durationSeconds value.`);
-    state.logs = await logsResponse.json();
-    // Import any sessions saved by the earlier browser-only version if the local file is empty.
-    if (state.logs.length === 0) {
-      try {
-        const oldLogs = JSON.parse(localStorage.getItem('training-session-log') || '[]');
-        if (Array.isArray(oldLogs) && oldLogs.length) {
-          for (const entry of [...oldLogs].reverse()) {
-            await fetch('/api/logs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry) });
-          }
-          localStorage.removeItem('training-session-log');
-          state.logs = await (await fetch('/api/logs')).json();
-        }
-      } catch (migrationError) { console.warn('Could not migrate older browser session logs.', migrationError); }
-    }
     state.dayIndex = todayIndex();
-    updateLogCount();
     $('statusText').textContent = 'Ready';
     render();
   } catch (error) {
@@ -571,7 +434,7 @@ $('moduleToggle').addEventListener('click', () => {
   else if (state.timedSession) toggleTimedPause();
   else done();
 });
-$('endIntervals').addEventListener('click', endIntervals);
+$('endIntervals').addEventListener('click', () => endIntervals());
 $('railToggle').addEventListener('click', () => {
   const collapsed = !$('workspace').classList.contains('rail-collapsed');
   $('workspace').classList.toggle('rail-collapsed', collapsed);
@@ -593,8 +456,6 @@ $('todayButton').addEventListener('click', () => {
 });
 $('backButton').addEventListener('click', () => navigateModule(-1));
 $('nextButton').addEventListener('click', () => navigateModule(1));
-$('logToggle').addEventListener('click', () => { renderLog(); $('logDialog').showModal(); });
-$('closeLog').addEventListener('click', () => $('logDialog').close());
 $('fullscreenButton').addEventListener('click', async () => {
   try {
     if (document.fullscreenElement) await document.exitFullscreen();
@@ -613,17 +474,8 @@ document.addEventListener('fullscreenchange', () => {
     ? 'M8 3v3a2 2 0 0 1-2 2H3m13-5v3a2 2 0 0 0 2 2h3M3 16h3a2 2 0 0 1 2 2v3m8 0v-3a2 2 0 0 1 2-2h3'
     : 'M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3');
 });
-$('clearLog').addEventListener('click', async () => {
-  try {
-    const response = await fetch('/api/logs', { method: 'DELETE' });
-    if (!response.ok) throw new Error('The log file could not be cleared.');
-    state.logs = [];
-    updateLogCount();
-    renderLog();
-  } catch (error) { console.error(error); }
-});
 document.addEventListener('keydown', (event) => {
-  if ($('logDialog').open || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+  if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
   if (event.key === 'ArrowLeft') navigateModule(-1);
   if (event.key === 'ArrowRight') navigateModule(1);
 });
