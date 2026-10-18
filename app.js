@@ -177,22 +177,7 @@ function render() {
     return button;
   }));
 
-  const image = $('moduleImage');
-  const hasImage = Boolean(module.image);
-  image.hidden = !hasImage;
-  $('visualColumn').hidden = !hasImage;
-  $('moduleContent').classList.toggle('with-image', hasImage);
-  $('visualPlaceholder').hidden = true;
-  $('visualColumn').classList.toggle('has-image', hasImage);
-  if (hasImage) {
-    image.src = module.image;
-    image.alt = module.imageAlt || '';
-    image.removeAttribute('style');
-  } else {
-    image.removeAttribute('src');
-    image.alt = '';
-    $('visualIndex').textContent = pad(state.moduleIndex + 1);
-  }
+  setModuleVisual(module, state.timedSession?.activeStepIndex >= 0 ? state.timedSession.activeStepIndex : 0);
 
   renderTimedSteps(module);
   const active = Boolean(state.startedAt);
@@ -240,6 +225,27 @@ function renderTimedSteps(module) {
   updateTimedDisplay();
 }
 
+function setModuleVisual(module, stepIndex = 0) {
+  const step = isTimed(module) ? module.steps[stepIndex] : null;
+  const source = step?.image || module.image;
+  const hasImage = Boolean(source);
+  const image = $('moduleImage');
+  image.hidden = !hasImage;
+  $('visualColumn').hidden = !hasImage;
+  $('moduleContent').classList.toggle('with-image', hasImage);
+  $('visualPlaceholder').hidden = true;
+  $('visualColumn').classList.toggle('has-image', hasImage);
+  if (hasImage) {
+    if (image.getAttribute('src') !== source) image.src = source;
+    image.alt = step?.image ? (step.imageAlt || module.imageAlt || '') : (module.imageAlt || '');
+    image.removeAttribute('style');
+  } else {
+    image.removeAttribute('src');
+    image.alt = '';
+    $('visualIndex').textContent = pad(state.moduleIndex + 1);
+  }
+}
+
 function updateTimer() {
   if (!state.startedAt) return;
   if (state.timedSession) {
@@ -264,6 +270,7 @@ function updateTimedDisplay() {
   }
   const previousActive = session.activeStepIndex;
   session.activeStepIndex = activeIndex;
+  setModuleVisual(module, activeIndex);
   let start = 0;
   const items = [...$('timedStepList').children];
   items.forEach((item, index) => {
