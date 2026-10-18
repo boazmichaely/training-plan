@@ -28,15 +28,6 @@
         <div class="rail-topline"><span class="rail-label">SELECTED WORKOUT</span><span class="session-status"><i class="live-dot"></i><span id="statusText">Ready</span></span><button class="rail-toggle" id="railToggle" type="button" aria-expanded="true" aria-controls="sessionRail" aria-label="Collapse side panel" title="Collapse side panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6M20 6l-6 6 6 6"/></svg></button></div>
         <div class="set-summary"><span id="railDay">MONDAY</span><strong id="workoutNameRail">Everyday activity</strong><span class="workout-summary" id="workoutSummary"></span></div>
         <p class="workout-description" id="workoutDescription"></p>
-        <div class="session-controls">
-          <button class="button button-start" id="startButton" type="button"><span aria-hidden="true">▶</span> Start module</button>
-          <button class="button button-done" id="doneButton" type="button" hidden>Done <span aria-hidden="true">✓</span></button>
-          <div class="timer-panel" id="timerPanel" hidden>
-            <span class="timer-label">SESSION TIMER</span>
-            <strong id="timerDisplay">00:00</strong>
-            <span class="timer-started" id="timerStarted"></span>
-          </div>
-        </div>
         <div class="rail-divider"></div>
         <div class="module-list-head"><span class="rail-label">IN THIS WORKOUT</span><span class="module-count"><strong id="moduleNumber">01</strong> / <span id="moduleTotal">03</span></span></div>
         <nav class="module-list" id="moduleList" aria-label="Modules in this workout"></nav>
@@ -53,9 +44,20 @@
       <article class="module-view" id="moduleView">
         <div class="module-heading">
           <span class="module-category"><span id="moduleCategory">LOADING</span><span class="module-id" id="moduleId">01-warmup</span></span>
-          <span class="duration-tag" id="moduleDuration"></span>
+          <div class="module-actions">
+            <span class="duration-tag" id="moduleDuration"></span>
+            <div class="session-controls">
+              <button class="button module-toggle" id="moduleToggle" type="button" aria-pressed="false" aria-label="Start this module"><span class="module-toggle-icon" aria-hidden="true">▶</span><span id="moduleToggleText">Start</span></button>
+              <div class="timer-panel timer-idle" id="timerPanel" aria-hidden="true">
+                <span class="timer-label">MODULE TIMER</span>
+                <strong id="timerDisplay">00:00</strong>
+                <span class="timer-started" id="timerStarted"></span>
+              </div>
+            </div>
+          </div>
         </div>
         <h2 class="module-title" id="moduleTitle">Loading your training…</h2>
+        <span class="module-repeat" id="moduleRepeat" hidden></span>
         <div class="module-content" id="moduleContent">
           <div class="module-copy">
             <section class="instructions-pane" aria-label="Module instructions">
@@ -77,6 +79,6 @@
     <div id="logEntries" class="log-entries"></div>
     <div class="dialog-foot"><span>Saved on this device</span><button id="clearLog" class="text-button" type="button">Clear log</button></div>
   </dialog>
-  <script src="app.js"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>

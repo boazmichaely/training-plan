@@ -1,10 +1,7 @@
 ## 01-warmup
-## Stretches and gentle movement
-
-- Stretches!
-- Walk around for 2 minutes.
-- Add easy shoulder rolls and arm swings.
-
+- Stand near a sturdy counter. Begin with an easy march.
+- Add shoulder rolls and relaxed arm swings. Gradually make your steps a little brisker.
+- **4 minutes.**
 
 ## 02-chair-sit-to-stand
 - Place a firm, high chair against a wall. 
@@ -13,19 +10,19 @@
 - Lean your chest slightly forward, send your hips back, and lower only as far as comfortable. 
   Lightly touch the seat, then stand smoothly.
 - Keep knees pointing in the same direction as your toes. 
-  Do **2 sets of 6–10 reps**, resting 60–90 seconds.
+- Do **3 sets of 8–12 reps**, resting 60–90 seconds. Use a chair height and range you can control.
 
 ## 03-wall-push-ups
 - Stand facing a clear wall, close enough to place your hands at chest height a little wider than your shoulders.
 - Step back only as far as feels easy to control. 
   Keep your body comfortably straight and your back relaxed.
 - Bend your elbows to bring your chest toward the wall, then press away. 
-- Do **2 sets of 8–12 reps**, resting 60–90 seconds.
+- Do **3 sets of 8–12 reps**, resting 60–90 seconds.
 
 ## 04-seated-band-row
 - Sit near the front of a firm chair. Loop a light band around both feet and hold an end in each hand. 
 - Sit tall without arching your lower back. Draw your elbows back comfortably, then return slowly.
-- Do **2 sets of 8–12 reps**, resting 60–90 seconds. Keep the band tension light enough to move smoothly.
+- Do **3 sets of 8–12 reps**, resting 60–90 seconds. Keep the band tension light enough to move smoothly.
 
 ## 05-hip-abduction
 - Stand beside a sturdy counter and hold it with one or both hands. Stand tall with both feet pointing forward.
@@ -43,7 +40,7 @@
   Hold an end in each hand at chest level. 
 - Stand in a comfortable staggered stance. 
   Press both hands forward smoothly, then return slowly without arching your back.
-- Do **2 sets of 8–12 reps**, resting 60–90 seconds. Keep the band away from your neck and face.
+- Do **3 sets of 8–12 reps**, resting 60–90 seconds. Keep the band away from your neck and face.
 
 ## 08-supported-dumbbell-row
 * If hinging forward bothers your back, replace this with the seated resistance-band row. *
@@ -52,7 +49,7 @@
   Hold a light dumbbell—or a small water bottle—in the other hand. 
   Keep your spine comfortable and avoid twisting or reaching far forward.
 - Draw the weight toward your hip with your elbow close to your side, then lower slowly.
-- Do **2 sets of 8–12 reps per side**, resting 60–90 seconds. Use a very light weight at first.
+- Do **3 sets of 8–12 reps per side**, resting 60–90 seconds. Use a light weight.
 
 ## 09-standing-hamstring-curl
 - Stand behind a sturdy chair and hold its back. 
@@ -86,11 +83,27 @@
 - Keep breathing normally and stay within a pain-free range. This is optional after the walk.
 
 ## 14-cool-down-walk
-- Walk slowly on a clear, level path for about 3 minutes.
-- Let your pace ease gradually and breathe normally.
-- Stretches
+- March slowly or take easy steps beside a sturdy counter.
+- Let your breathing return toward normal.
+- **2 minutes.**
 
 ## 15-easy-walk
 - Walk
 - Stretch
+
+## 16-indoor-cardio-a
+- **30 second each:**
+  1. Side steps
+  2. Marching
+  3. Heel curls
+  4. Step-touch with relaxed arm swings
+  5. Repeat your preferred move
+- March easily for **30 seconds**. Let your breathing settle.
+- **1 round × (2½ min brisk + 30 sec easy).**
+
+## 17-indoor-cardio-b
+- Keep a sturdy counter nearby. Face forward and use small, quiet steps.
+- Move briskly for **2½ minutes**: 30 seconds each of forward toe taps, side steps, supported marching, and heel digs with relaxed reaches. Repeat your preferred move for the last 30 seconds.
+- Then march easily for **30 seconds**. Let your breathing settle.
+- **1 round × (2½ min brisk + 30 sec easy).**
 

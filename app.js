@@ -12,8 +12,20 @@ function todayIndex() {
 }
 function currentDay() { return state.days[state.dayIndex]; }
 function currentWorkout() { return state.workoutsById.get(currentDay().workoutId); }
-function currentModules() { return currentWorkout().moduleIds.map((id) => state.modulesById.get(id)); }
+function currentSteps() {
+  return currentWorkout().steps.flatMap((step) => {
+    const repeatCount = step.repeat || 1;
+    return Array.from({ length: repeatCount }, (_, index) => ({
+      module: state.modulesById.get(step.moduleId), repeatIndex: index + 1, repeatCount,
+    }));
+  });
+}
+function currentModules() { return currentSteps().map((step) => step.module); }
 function currentModule() { return currentModules()[state.moduleIndex]; }
+function repeatDetails(steps, index) {
+  const step = steps[index];
+  return { round: step.repeatIndex, total: step.repeatCount };
+}
 
 function parseInstructionSections(markdown) {
   const sections = new Map();
@@ -47,7 +59,7 @@ function renderInstructions(markdown) {
   container.replaceChildren();
   const lines = String(markdown || '').split(/\r?\n/);
   const headingPattern = /^#{1,3}\s+/;
-  const listPattern = /^\s*([-*+] |\d+\. )(.*)$/;
+  const listPattern = /^(\s*)([-*+] |\d+\. )(.*)$/;
   let index = 0;
   while (index < lines.length) {
     if (!lines[index].trim()) { index += 1; continue; }
@@ -61,25 +73,37 @@ function renderInstructions(markdown) {
     }
     const firstListItem = lines[index].match(listPattern);
     if (firstListItem) {
-      const ordered = /^\s*\d+\. /.test(lines[index]);
-      const list = document.createElement(ordered ? 'ol' : 'ul');
-      while (index < lines.length) {
-        const itemMatch = lines[index].match(listPattern);
-        if (!itemMatch || /^\s*\d+\. /.test(lines[index]) !== ordered) break;
-        const itemLines = [itemMatch[2].trimEnd()];
-        index += 1;
-        while (index < lines.length && /^\s+\S/.test(lines[index]) && !lines[index].match(listPattern)) {
-          itemLines.push(lines[index].trim());
+      const parseList = (indent, ordered) => {
+        const list = document.createElement(ordered ? 'ol' : 'ul');
+        let lastItem = null;
+        while (index < lines.length) {
+          const itemMatch = lines[index].match(listPattern);
+          if (!itemMatch) break;
+          const itemIndent = itemMatch[1].replace(/\t/g, '    ').length;
+          const itemOrdered = /^\d+\. /.test(itemMatch[2]);
+          if (itemIndent < indent) break;
+          if (itemIndent > indent) {
+            if (lastItem) lastItem.append(parseList(itemIndent, itemOrdered));
+            else index += 1;
+            continue;
+          }
+          if (itemOrdered !== ordered) break;
+          const item = document.createElement('li');
+          appendInlineMarkdown(item, itemMatch[3].trimEnd());
+          list.append(item);
+          lastItem = item;
           index += 1;
+          while (index < lines.length && /^\s+\S/.test(lines[index]) && !lines[index].match(listPattern)) {
+            item.append(document.createElement('br'));
+            appendInlineMarkdown(item, lines[index].trim());
+            index += 1;
+          }
         }
-        const item = document.createElement('li');
-        itemLines.forEach((line, lineIndex) => {
-          if (lineIndex) item.append(document.createElement('br'));
-          appendInlineMarkdown(item, line);
-        });
-        list.append(item);
-      }
-      container.append(list);
+        return list;
+      };
+      const indent = firstListItem[1].replace(/\t/g, '    ').length;
+      const ordered = /^\d+\. /.test(firstListItem[2]);
+      container.append(parseList(indent, ordered));
       continue;
     }
     const paragraphLines = [];
@@ -98,7 +122,8 @@ function renderInstructions(markdown) {
 function render() {
   const day = currentDay();
   const workout = currentWorkout();
-  const modules = currentModules();
+  const steps = currentSteps();
+  const modules = steps.map((step) => step.module);
   const isToday = state.dayIndex === todayIndex();
   const module = modules[state.moduleIndex];
   $('weekHeader').classList.toggle('is-today', isToday);
@@ -116,7 +141,10 @@ function render() {
   $('moduleId').textContent = module.id;
   $('moduleTitle').textContent = module.title;
   renderInstructions(module.instructions);
+  const repeat = repeatDetails(steps, state.moduleIndex);
   $('moduleDuration').textContent = module.duration || '';
+  $('moduleRepeat').hidden = repeat.total < 2;
+  $('moduleRepeat').textContent = repeat.total > 1 ? `ROUND ${pad(repeat.round)} / ${pad(repeat.total)}` : '';
   $('moduleNumber').textContent = pad(state.moduleIndex + 1);
   $('moduleTotal').textContent = pad(modules.length);
   $('progressFill').style.width = `${((state.moduleIndex + 1) / modules.length) * 100}%`;
@@ -136,7 +164,9 @@ function render() {
     const text = document.createElement('span');
     text.className = 'module-link-text';
     const titlePrefix = `${day.label} ${item.id.split('-')[0]}-`;
-    text.textContent = item.title.startsWith(titlePrefix) ? item.title.slice(titlePrefix.length) : item.title;
+    const title = item.title.startsWith(titlePrefix) ? item.title.slice(titlePrefix.length) : item.title;
+    const repeat = repeatDetails(steps, index);
+    text.textContent = repeat.total > 1 ? `Round ${repeat.round} of ${repeat.total} · ${title}` : title;
     button.append(number, text);
     button.addEventListener('click', () => { state.moduleIndex = index; render(); });
     return button;
@@ -159,9 +189,14 @@ function render() {
     $('visualIndex').textContent = pad(state.moduleIndex + 1);
   }
 
-  $('startButton').hidden = Boolean(state.startedAt);
-  $('doneButton').hidden = !state.startedAt;
-  $('timerPanel').hidden = !state.startedAt;
+  const active = Boolean(state.startedAt);
+  const toggle = $('moduleToggle');
+  toggle.classList.toggle('is-pressed', active);
+  toggle.setAttribute('aria-pressed', String(active));
+  toggle.setAttribute('aria-label', active ? 'Done and save this module' : 'Start this module');
+  $('moduleToggleText').textContent = active ? 'Done' : 'Start';
+  $('timerPanel').classList.toggle('timer-idle', !active);
+  $('timerPanel').setAttribute('aria-hidden', String(!active));
   if (state.startedAt) updateTimer();
 }
 
@@ -180,10 +215,12 @@ function start() {
   const day = currentDay();
   const workout = currentWorkout();
   const module = currentModule();
+  const repeat = repeatDetails(currentSteps(), state.moduleIndex);
   state.startedAt = {
     timestamp: now.getTime(), date: localDate(now),
     time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
     moduleId: module.id, module: module.title,
+    moduleRound: repeat.total > 1 ? repeat.round : null, moduleRoundTotal: repeat.total > 1 ? repeat.total : null,
     workoutId: workout.id, workoutName: workout.name, workoutDay: day.label,
   };
   $('statusText').textContent = 'In progress';
@@ -198,6 +235,7 @@ async function done() {
   const entry = {
     workoutId: state.startedAt.workoutId, workoutName: state.startedAt.workoutName, workoutDay: state.startedAt.workoutDay,
     moduleId: state.startedAt.moduleId, module: state.startedAt.module,
+    moduleRound: state.startedAt.moduleRound, moduleRoundTotal: state.startedAt.moduleRoundTotal,
     date: state.startedAt.date, startTime: state.startedAt.time,
     duration: mmss(elapsed), seconds: elapsed,
   };
@@ -216,7 +254,9 @@ async function done() {
   clearInterval(state.timerId);
   state.timerId = null;
   state.startedAt = null;
-  $('statusText').textContent = 'Session saved';
+  const hasNextModule = state.moduleIndex < currentModules().length - 1;
+  if (hasNextModule) state.moduleIndex += 1;
+  $('statusText').textContent = hasNextModule ? 'Session saved · Next module' : 'Workout complete';
   render();
 }
 
@@ -256,7 +296,9 @@ function renderLog() {
     set.textContent = workoutName ? `${workoutDay || ''} · ${workoutName}` : 'Training session';
     const module = document.createElement('span');
     module.className = 'log-module';
-    module.textContent = entry.module || '';
+    module.textContent = entry.moduleRound && entry.moduleRoundTotal
+      ? `${entry.module || ''} · Round ${entry.moduleRound}/${entry.moduleRoundTotal}`
+      : entry.module || '';
     const meta = document.createElement('span');
     meta.textContent = `${entry.date || ''} · Started ${entry.startTime || ''}`;
     const duration = document.createElement('span');
@@ -292,8 +334,9 @@ async function init() {
     state.days = data.days;
     for (const day of state.days) {
       const workout = state.workoutsById.get(day.workoutId);
-      if (!workout || !Array.isArray(workout.moduleIds) || !workout.moduleIds.length || workout.moduleIds.length > 8) throw new Error(`The ${day.label} workout must contain between one and eight modules.`);
-      if (workout.moduleIds.some((id) => !state.modulesById.has(id))) throw new Error(`The ${day.label} workout references a missing module.`);
+      const expandedCount = Array.isArray(workout?.steps) ? workout.steps.reduce((total, step) => total + (step.repeat || 1), 0) : 0;
+      if (!Array.isArray(workout?.steps) || !workout.steps.length || expandedCount > 16) throw new Error(`The ${day.label} workout must expand to between one and sixteen module steps.`);
+      if (workout.steps.some((step) => !state.modulesById.has(step.moduleId) || !Number.isInteger(step.repeat || 1) || (step.repeat || 1) < 1)) throw new Error(`The ${day.label} workout has an invalid or missing module step.`);
     }
     state.logs = await logsResponse.json();
     // Import any sessions saved by the earlier browser-only version if the local file is empty.
@@ -321,7 +364,7 @@ async function init() {
   }
 }
 
-$('startButton').addEventListener('click', start);
+$('moduleToggle').addEventListener('click', () => { if (state.startedAt) done(); else start(); });
 $('railToggle').addEventListener('click', () => {
   const collapsed = !$('workspace').classList.contains('rail-collapsed');
   $('workspace').classList.toggle('rail-collapsed', collapsed);
@@ -333,7 +376,6 @@ $('railToggle').addEventListener('click', () => {
     : 'm14 6-6 6 6 6M20 6l-6 6 6 6');
   try { localStorage.setItem('training-side-panel-collapsed', String(collapsed)); } catch (error) { /* The control still works for this page view. */ }
 });
-$('doneButton').addEventListener('click', done);
 $('previousDay').addEventListener('click', () => navigateDay(-1));
 $('nextDay').addEventListener('click', () => navigateDay(1));
 $('todayButton').addEventListener('click', () => {

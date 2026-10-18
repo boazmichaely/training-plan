@@ -333,3 +333,91 @@ body.weekly-app{height:100dvh;min-height:620px;overflow:hidden;background:#f4f6f
 /* Make the prescribed work amount easy to read at a glance. */
 .duration-tag{font-size:clamp(18px,1.6vw,30px);font-weight:600;line-height:1.1;padding:10px 16px}
 @media(max-width:780px){.duration-tag{font-size:clamp(15px,2.8vw,20px);padding:7px 10px}}
+
+/* Module actions belong to the active module, directly below its dose. */
+.module-heading{align-items:flex-start}
+.module-actions{width:min(270px,30vw);display:flex;flex-direction:column;align-items:stretch;gap:8px;flex:none}
+.module-actions .duration-tag,.module-actions .module-repeat{align-self:flex-end}
+.module-repeat{padding:3px 2px;color:#4057d8;font:600 10px 'DM Mono',monospace;letter-spacing:.08em}
+.module-actions .session-controls{width:100%;display:flex;flex-direction:column;gap:8px}
+.module-actions .session-controls .button{width:100%;min-height:40px}
+.module-actions .timer-panel{width:100%;margin:0}
+@media(max-width:780px){.module-actions{width:min(245px,42vw)}.module-actions .session-controls .button{min-height:38px}}
+@media(max-width:520px){.module-heading{align-items:flex-start;gap:8px}.module-actions{width:min(190px,48vw)}.module-actions .duration-tag{font-size:14px;padding:6px 9px}.module-actions .session-controls .button{font-size:10px;padding:0 8px}.module-actions .timer-panel{grid-template-columns:1fr auto;padding:8px}.module-actions .timer-started{display:none}}
+
+
+/* One tactile control toggles between its raised Start and pressed Done states. */
+.module-actions .session-controls{gap:8px}
+.module-actions .module-toggle{position:relative;width:100%;min-height:44px;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #9dc72a;border-radius:8px;background:#caff3d;color:#182451;font:700 12px 'DM Sans',sans-serif;box-shadow:0 5px 0 #86ad20,0 8px 15px #9cc72c25;transform:translateY(-3px);transition:transform .12s ease,box-shadow .12s ease,background .12s ease}
+.module-actions .module-toggle:hover{background:#d4ff58;transform:translateY(-4px);box-shadow:0 6px 0 #86ad20,0 10px 16px #9cc72c30}
+.module-actions .module-toggle:active,.module-actions .module-toggle.is-pressed{background:#caff3d;transform:translateY(2px);box-shadow:inset 0 3px 5px #718e1f66,0 1px 0 #86ad20}
+.module-toggle-icon{font-size:10px}
+.module-toggle.is-pressed .module-toggle-icon{font-size:0}
+.module-toggle.is-pressed .module-toggle-icon::after{content:'✓';font-size:14px}
+.module-actions .module-toggle:focus-visible{outline:3px solid #405cf5;outline-offset:3px}
+.module-actions .timer-panel{min-height:72px}
+.module-actions .timer-panel.timer-idle{visibility:hidden;pointer-events:none}
+@media(max-width:780px){.module-actions .module-toggle{min-height:42px}}
+@media(max-width:520px){.module-actions .module-toggle{min-height:40px;font-size:10px}}
+
+
+/* Keep the timer out of layout flow; show it in the existing gap below the toggle. */
+.module-actions .session-controls{position:relative;gap:0}
+.module-actions .timer-panel{position:absolute;top:calc(100% + 8px);right:0;z-index:2;width:100%;min-height:38px;height:38px;margin:0;padding:5px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-radius:7px;background:#1d2856;color:#fff}
+.module-actions .timer-panel.timer-idle{visibility:hidden;pointer-events:none}
+.module-actions .timer-label{font:600 8px 'DM Mono',monospace;color:#e0ff78;letter-spacing:.1em;white-space:nowrap}
+.module-actions .timer-panel strong{font:400 19px 'DM Mono',monospace;letter-spacing:.04em}
+.module-actions .timer-started{font-size:8px;color:#bbc6ed;margin:0;white-space:nowrap}
+@media(max-width:520px){.module-actions .timer-panel{min-height:36px;height:36px;padding:4px 8px}.module-actions .timer-started{display:none}}
+
+
+/* Put the module title at the top independently of the taller control stack. */
+.module-view{position:relative}
+.module-title{position:absolute;top:clamp(54px,6vh,76px);left:28px;z-index:1;margin:0;width:calc(100% - 56px)}
+.module-content{margin-top:48px}
+.module-actions{width:min(360px,35vw)}
+.module-actions .duration-tag{max-width:none;white-space:nowrap;font-size:clamp(16px,1.35vw,24px);padding:8px 12px}
+@media(max-width:780px){
+  .module-title{position:static;width:100%;margin:16px 0 0}
+  .module-content{margin-top:0}
+  .module-actions{width:min(245px,42vw)}
+  .module-actions .duration-tag{white-space:normal;font-size:clamp(15px,2.8vw,20px);padding:7px 10px}
+}
+@media(max-width:520px){.module-actions{width:min(190px,48vw)}.module-actions .duration-tag{font-size:14px;padding:6px 9px}}
+
+/* The positioned headline spans the view; let clicks pass through its empty area to controls. */
+.module-title{pointer-events:none}
+
+
+/* Keep the repeat marker with the title and keep the toggle footprint fixed. */
+.module-title{margin-bottom:0}
+.module-repeat{position:absolute;top:clamp(112px,14vh,168px);left:28px;display:table;margin:0;padding:5px 10px;border-radius:5px;background:#eef0ff;color:#4057d8;font:700 12px 'DM Mono',monospace;letter-spacing:.08em}
+.module-actions .duration-tag{font-size:clamp(18px,1.6vw,30px);padding:10px 16px}
+.module-actions .module-toggle{transform:none;box-shadow:0 5px 0 #86ad20,0 8px 15px #9cc72c25}
+.module-actions .module-toggle:hover{transform:none;box-shadow:0 5px 0 #86ad20,0 8px 15px #9cc72c25}
+.module-actions .module-toggle:active,.module-actions .module-toggle.is-pressed{transform:none;box-shadow:inset 0 3px 5px #718e1f66,0 1px 0 #86ad20}
+@media(max-width:780px){.module-repeat{position:static;margin-top:6px}.module-actions .duration-tag{font-size:clamp(15px,2.8vw,20px);padding:7px 10px}}
+@media(max-width:520px){.module-actions .duration-tag{font-size:14px;padding:6px 9px}}
+
+
+/* Give the round marker the former dose badge prominence while reducing the title scale. */
+.module-title{font-size:clamp(34px,3.2vw,60px);line-height:1.04}
+.module-repeat{font-size:clamp(18px,1.6vw,30px);padding:10px 16px}
+@media(max-width:780px){
+  .module-title{font-size:clamp(29px,6vw,40px);line-height:1.06}
+  .module-repeat{font-size:clamp(16px,2.8vw,20px);padding:8px 12px}
+}
+
+
+/* Center the enlarged round marker beneath the title. */
+.module-repeat{left:50%;transform:translateX(-50%)}
+@media(max-width:780px){.module-repeat{left:auto;transform:none;margin-left:auto;margin-right:auto}}
+
+
+/* Match the original round badge's pill shape and emphasis. */
+.module-repeat{border-radius:999px;background:#eef0ff;color:#4057d8;font-weight:700}
+
+
+/* Keep nested movement lists compact and visibly subordinate. */
+.markdown-content ul ul,.markdown-content ul ol,.markdown-content ol ul,.markdown-content ol ol{margin:.3em 0 .45em;padding-left:1.5em}
+.markdown-content li li+li{margin-top:.3em}

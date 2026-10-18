@@ -4,22 +4,22 @@
     {
       "id": "monday",
       "label": "Monday",
-      "workoutId": "weekday-easy"
+      "workoutId": "cardio-a"
     },
     {
       "id": "tuesday",
       "label": "Tuesday",
-      "workoutId": "weekday-easy"
+      "workoutId": "cardio-b"
     },
     {
       "id": "wednesday",
       "label": "Wednesday",
-      "workoutId": "weekday-easy"
+      "workoutId": "cardio-a"
     },
     {
       "id": "thursday",
       "label": "Thursday",
-      "workoutId": "weekday-easy"
+      "workoutId": "cardio-balance-b"
     },
     {
       "id": "friday",
@@ -29,7 +29,7 @@
     {
       "id": "saturday",
       "label": "Saturday",
-      "workoutId": "walk-balance"
+      "workoutId": "cardio-balance"
     },
     {
       "id": "sunday",
@@ -39,52 +39,142 @@
   ],
   "workouts": [
     {
-      "id": "weekday-easy",
-      "name": "Everyday activity",
-      "summary": "Optional easy movement · 10–20 min",
-      "description": "Keep up ordinary activity and take a comfortable walk.",
-      "moduleIds": [
-        "15-easy-walk"
+      "id": "cardio-a",
+      "name": "Indoor Cardio A",
+      "summary": "Indoor intervals · 30–42 min",
+      "description": "Start with 8 rounds. Add one round when comfortable, up to 12.",
+      "steps": [
+        {
+          "moduleId": "01-warmup"
+        },
+        {
+          "moduleId": "16-indoor-cardio-a",
+          "repeat": 8
+        },
+        {
+          "moduleId": "14-cool-down-walk"
+        }
+      ]
+    },
+    {
+      "id": "cardio-b",
+      "name": "Indoor Cardio B",
+      "summary": "Indoor intervals · 30–42 min",
+      "description": "Start with 8 rounds. Add one round when comfortable, up to 12.",
+      "steps": [
+        {
+          "moduleId": "01-warmup"
+        },
+        {
+          "moduleId": "17-indoor-cardio-b",
+          "repeat": 8
+        },
+        {
+          "moduleId": "14-cool-down-walk"
+        }
+      ]
+    },
+    {
+      "id": "cardio-balance",
+      "name": "Cardio and balance",
+      "summary": "Cardio + balance · 30–42 min",
+      "description": "Start with 8 rounds. Add one when comfortable, up to 12. Finish with balance.",
+      "steps": [
+        {
+          "moduleId": "01-warmup"
+        },
+        {
+          "moduleId": "16-indoor-cardio-a",
+          "repeat": 8
+        },
+        {
+          "moduleId": "14-cool-down-walk"
+        },
+        {
+          "moduleId": "11-tandem-balance"
+        },
+        {
+          "moduleId": "12-supported-weight-shifts"
+        }
       ]
     },
     {
       "id": "strength-a",
       "name": "Strength A",
       "summary": "Home strength · about 30 min",
-      "description": "Use a firm chair, light band, and counter. Rest 60–90 seconds between sets.",
-      "moduleIds": [
-        "01-warmup",
-        "02-chair-sit-to-stand",
-        "03-wall-push-ups",
-        "04-seated-band-row",
-        "05-hip-abduction",
-        "06-calf-raises"
-      ]
-    },
-    {
-      "id": "walk-balance",
-      "name": "Walking and balance",
-      "summary": "Easy conditioning · 20–30 min",
-      "description": "Walk then practice balance beside a sturdy counter.",
-      "moduleIds": [
-        "15-easy-walk",
-        "11-tandem-balance",
-        "12-supported-weight-shifts",
-        "14-cool-down-walk"
+      "description": "Use controlled resistance that makes the final reps challenging. Progress gradually.",
+      "steps": [
+        {
+          "moduleId": "01-warmup"
+        },
+        {
+          "moduleId": "02-chair-sit-to-stand"
+        },
+        {
+          "moduleId": "03-wall-push-ups"
+        },
+        {
+          "moduleId": "04-seated-band-row"
+        },
+        {
+          "moduleId": "05-hip-abduction"
+        },
+        {
+          "moduleId": "06-calf-raises"
+        }
       ]
     },
     {
       "id": "strength-b",
       "name": "Strength B",
       "summary": "Home strength · about 30 min",
-      "description": "Use a firm chair, light band, and counter. Rest 60–90 seconds between sets.",
-      "moduleIds": [
-        "01-warmup",
-        "02-chair-sit-to-stand",
-        "07-standing-band-chest-press",
-        "08-supported-dumbbell-row",
-        "09-standing-hamstring-curl",
-        "10-supported-march"
+      "description": "Use controlled resistance that makes the final reps challenging. Progress gradually.",
+      "steps": [
+        {
+          "moduleId": "01-warmup"
+        },
+        {
+          "moduleId": "02-chair-sit-to-stand"
+        },
+        {
+          "moduleId": "07-standing-band-chest-press"
+        },
+        {
+          "moduleId": "08-supported-dumbbell-row"
+        },
+        {
+          "moduleId": "09-standing-hamstring-curl"
+        },
+        {
+          "moduleId": "10-supported-march"
+        },
+        {
+          "moduleId": "11-tandem-balance"
+        }
+      ]
+    },
+    {
+      "id": "cardio-balance-b",
+      "name": "Cardio and balance",
+      "summary": "Cardio + balance · 30–42 min",
+      "description": "Start with 8 rounds. Add one when comfortable, up to 12. Finish with balance.",
+      "steps": [
+        {
+          "moduleId": "01-warmup"
+        },
+        {
+          "moduleId": "17-indoor-cardio-b",
+          "repeat": 8
+        },
+        {
+          "moduleId": "14-cool-down-walk"
+        },
+        {
+          "moduleId": "11-tandem-balance"
+        },
+        {
+          "moduleId": "12-supported-weight-shifts"
+        }
       ]
     }
   ],
@@ -101,7 +191,7 @@
       "id": "02-chair-sit-to-stand",
       "category": "STRENGTH · LEGS",
       "title": "High-chair sit-to-stand",
-      "duration": "2 SETS · 6–10 REPS",
+      "duration": "3 SETS · 8–12 REPS",
       "image": "images/exercises/02-chair-sit-to-stand.png",
       "imageAlt": "Older adult practicing a controlled sit-to-stand from a firm chair"
     },
@@ -109,7 +199,7 @@
       "id": "03-wall-push-ups",
       "category": "STRENGTH · PUSH",
       "title": "Wall push-ups",
-      "duration": "2 SETS · 8–12 REPS",
+      "duration": "3 SETS · 8–12 REPS",
       "image": "images/exercises/03-wall-push-ups.png",
       "imageAlt": "Older adult doing a wall push-up with hands at chest height"
     },
@@ -117,7 +207,7 @@
       "id": "04-seated-band-row",
       "category": "STRENGTH · BACK",
       "title": "Seated resistance-band row",
-      "duration": "2 SETS · 8–12 REPS",
+      "duration": "3 SETS · 8–12 REPS",
       "image": "images/exercises/04-seated-band-row.png",
       "imageAlt": "Older adult seated upright, pulling a resistance band toward the torso"
     },
@@ -141,7 +231,7 @@
       "id": "07-standing-band-chest-press",
       "category": "STRENGTH · CHEST",
       "title": "Standing band chest press",
-      "duration": "2 SETS · 8–12 REPS",
+      "duration": "3 SETS · 8–12 REPS",
       "image": "images/band-chest-press.png",
       "imageAlt": "Older adult doing a standing chest press with a resistance band looped around the upper back"
     },
@@ -149,7 +239,7 @@
       "id": "08-supported-dumbbell-row",
       "category": "STRENGTH · BACK",
       "title": "Supported one-arm dumbbell row",
-      "duration": "2 SETS · 8–12 EACH SIDE",
+      "duration": "3 SETS · 8–12 EACH SIDE",
       "image": "images/exercises/08-supported-dumbbell-row.png",
       "imageAlt": "Older adult using one hand on a sturdy counter for support while rowing a light dumbbell"
     },
@@ -197,7 +287,7 @@
       "id": "14-cool-down-walk",
       "category": "COOLDOWN",
       "title": "Easy cool-down walk",
-      "duration": "3 MIN",
+      "duration": "2 MIN",
       "image": "images/exercises/14-cool-down-walk.png",
       "imageAlt": "Older adult walking slowly indoors to cool down"
     },
@@ -208,6 +298,22 @@
       "duration": "10–25 MIN",
       "image": "images/exercises/15-easy-walk.png",
       "imageAlt": "Older adult walking at a comfortable pace on a level outdoor path"
+    },
+    {
+      "id": "16-indoor-cardio-a",
+      "category": "AEROBIC · ROUND",
+      "title": "Low-impact interval · A",
+      "duration": "3 MIN",
+      "image": "images/exercises/01-warmup.png",
+      "imageAlt": "Older adult gently marching in place beside a sturdy chair"
+    },
+    {
+      "id": "17-indoor-cardio-b",
+      "category": "AEROBIC · ROUND",
+      "title": "Low-impact interval · B",
+      "duration": "3 MIN",
+      "image": "images/exercises/01-warmup.png",
+      "imageAlt": "Older adult gently marching in place beside a sturdy chair"
     }
   ],
   "instructionsFile": "instructions.md"
